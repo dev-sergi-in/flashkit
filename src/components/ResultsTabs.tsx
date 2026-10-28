@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import type { ReactNode } from 'react'
 import { Globe, Instagram, Mail, Tag } from 'lucide-react'
 import type { GeneratedKit } from '@/types'
 import { ResultCard } from './ResultCard'
@@ -12,7 +13,7 @@ interface ResultsTabsProps {
 
 type TabId = 'web' | 'instagram' | 'email' | 'print'
 
-const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
+const TABS: { id: TabId; label: string; icon: ReactNode }[] = [
   { id: 'web', label: 'Annonce Web', icon: <Globe className="w-4 h-4" /> },
   { id: 'instagram', label: 'Instagram', icon: <Instagram className="w-4 h-4" /> },
   { id: 'email', label: 'Email', icon: <Mail className="w-4 h-4" /> },
