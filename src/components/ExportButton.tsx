@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Download, FileText, FileDown, Loader2 } from 'lucide-react'
 import type { GeneratedKit } from '@/types'
-import { downloadText, downloadPDF, downloadDOCX } from '@/lib/export'
+import { downloadText, downloadPDF } from '@/lib/export'
 
 interface ExportButtonProps {
   kit: GeneratedKit
@@ -14,16 +14,15 @@ export function ExportButton({ kit, isPro = false }: ExportButtonProps) {
   const [loading, setLoading] = useState<string | null>(null)
   const [open, setOpen] = useState(false)
 
-  const handleExport = async (format: 'txt' | 'pdf' | 'docx') => {
-    if ((format === 'pdf' || format === 'docx') && !isPro) {
-      alert('Export PDF et Word disponibles sur le plan Pro ou supérieur.')
+  const handleExport = async (format: 'txt' | 'pdf') => {
+    if (format === 'pdf' && !isPro) {
+      alert('Export PDF disponible sur le plan Pro ou supérieur.')
       return
     }
     setLoading(format)
     try {
       if (format === 'txt') downloadText(kit)
-      else if (format === 'pdf') await downloadPDF(kit)
-      else await downloadDOCX(kit)
+      else downloadPDF(kit)
     } finally {
       setLoading(null)
       setOpen(false)
@@ -45,7 +44,6 @@ export function ExportButton({ kit, isPro = false }: ExportButtonProps) {
           {[
             { format: 'txt' as const, label: '.TXT', icon: FileText, free: true },
             { format: 'pdf' as const, label: '.PDF', icon: FileDown, free: false },
-            { format: 'docx' as const, label: '.DOCX', icon: FileDown, free: false },
           ].map(({ format, label, icon: Icon, free }) => (
             <button
               key={format}
