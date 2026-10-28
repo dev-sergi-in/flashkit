@@ -43,57 +43,62 @@ export function downloadText(kit: GeneratedKit, filename = 'kit-marketing.txt') 
   URL.revokeObjectURL(url)
 }
 
-export async function downloadPDF(kit: GeneratedKit, filename = 'kit-marketing.pdf') {
-  const { jsPDF } = await import('jspdf')
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+export function downloadPDF(kit: GeneratedKit) {
+  const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Kit Marketing — IMMO-PROMPT AI</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; padding: 0; color: #111827; }
+  .header { background: #2563eb; color: white; padding: 20px 30px; }
+  .header h1 { margin: 0; font-size: 22px; }
+  .header p { margin: 4px 0 0; font-size: 12px; opacity: 0.85; }
+  .content { padding: 24px 30px; }
+  .section { margin-bottom: 24px; page-break-inside: avoid; }
+  .section-title { background: #2563eb; color: white; padding: 6px 12px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+  .label { font-weight: bold; font-size: 11px; }
+  p { margin: 4px 0; font-size: 11px; line-height: 1.6; }
+  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>IMMO-PROMPT AI</h1>
+  <p>Kit Marketing — ${new Date().toLocaleDateString('fr-FR')}</p>
+</div>
+<div class="content">
+  <div class="section">
+    <div class="section-title">Annonce Web SEO</div>
+    <p><span class="label">Titre :</span> ${kit.annonce_web.titre_seo}</p>
+    <p>${kit.annonce_web.description_longue.replace(/\n/g, '<br>')}</p>
+    <p><span class="label">Mots-clés :</span> ${kit.annonce_web.mots_cles.join(', ')}</p>
+  </div>
+  <div class="section">
+    <div class="section-title">Instagram</div>
+    <p>${kit.social_media.instagram_caption.replace(/\n/g, '<br>')}</p>
+    <p><span class="label">Hashtags :</span> ${kit.social_media.hashtags.join(' ')}</p>
+  </div>
+  <div class="section">
+    <div class="section-title">Email de Prospection</div>
+    <p><span class="label">Objet :</span> ${kit.outreach.email_objet}</p>
+    <p>${kit.outreach.email_corps.replace(/\n/g, '<br>')}</p>
+  </div>
+  <div class="section">
+    <div class="section-title">Fiche Vitrine</div>
+    <p><span class="label">Titre :</span> ${kit.print.titre_vitrine}</p>
+    ${kit.print.points_forts.map(p => `<p>• ${p}</p>`).join('')}
+  </div>
+</div>
+</body>
+</html>`
 
-  const blue: [number, number, number] = [37, 99, 235]
-  const dark: [number, number, number] = [17, 24, 39]
-
-  let y = 20
-  const margin = 20
-  const pageWidth = 210
-  const contentWidth = pageWidth - 2 * margin
-
-  const addSection = (title: string, content: string) => {
-    if (y > 260) { doc.addPage(); y = 20 }
-    doc.setFillColor(...blue)
-    doc.rect(margin, y - 4, contentWidth, 8, 'F')
-    doc.setTextColor(255, 255, 255)
-    doc.setFontSize(10)
-    doc.setFont('helvetica', 'bold')
-    doc.text(title, margin + 3, y + 1)
-    y += 10
-
-    doc.setTextColor(...dark)
-    doc.setFontSize(9)
-    doc.setFont('helvetica', 'normal')
-    const lines = doc.splitTextToSize(content, contentWidth)
-    lines.forEach((line: string) => {
-      if (y > 280) { doc.addPage(); y = 20 }
-      doc.text(line, margin, y)
-      y += 5
-    })
-    y += 6
-  }
-
-  doc.setFillColor(...blue)
-  doc.rect(0, 0, 210, 30, 'F')
-  doc.setTextColor(255, 255, 255)
-  doc.setFontSize(18)
-  doc.setFont('helvetica', 'bold')
-  doc.text('IMMO-PROMPT AI', margin, 15)
-  doc.setFontSize(9)
-  doc.setFont('helvetica', 'normal')
-  doc.text(`Kit Marketing — ${new Date().toLocaleDateString('fr-FR')}`, margin, 22)
-  y = 40
-
-  addSection('ANNONCE WEB SEO', `Titre : ${kit.annonce_web.titre_seo}\n\n${kit.annonce_web.description_longue}\n\nMots-clés : ${kit.annonce_web.mots_cles.join(', ')}`)
-  addSection('INSTAGRAM', `${kit.social_media.instagram_caption}\n\n${kit.social_media.hashtags.join(' ')}`)
-  addSection('EMAIL DE PROSPECTION', `Objet : ${kit.outreach.email_objet}\n\n${kit.outreach.email_corps}`)
-  addSection('FICHE VITRINE', `Titre : ${kit.print.titre_vitrine}\n\n${kit.print.points_forts.map(p => `• ${p}`).join('\n')}`)
-
-  doc.save(filename)
+  const win = window.open('', '_blank')
+  if (!win) return
+  win.document.write(html)
+  win.document.close()
+  win.focus()
+  setTimeout(() => { win.print() }, 300)
 }
 
 export async function downloadDOCX(kit: GeneratedKit, filename = 'kit-marketing.docx') {
