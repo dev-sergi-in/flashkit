@@ -1,12 +1,13 @@
+import type { ReactNode } from 'react'
 import { CopyButton } from './CopyButton'
 import { cn } from '@/lib/utils'
 
 interface ResultCardProps {
   title: string
-  icon: React.ReactNode
+  icon: ReactNode
   copyText: string
   className?: string
-  children: React.ReactNode
+  children: ReactNode
 }
 
 export function ResultCard({ title, icon, copyText, className, children }: ResultCardProps) {
