@@ -11,6 +11,7 @@ export default function BillingPage() {
   const [quota, setQuota] = useState<QuotaData | null>(null)
 
   useEffect(() => {
+    document.title = 'Abonnement \u2014 FlashKit'
     fetch('/api/quota').then(r => r.json()).then(setQuota).catch(() => {})
   }, [])
 
@@ -52,7 +53,7 @@ export default function BillingPage() {
 
           {currentPlan.prix_eur !== null && currentPlan.prix_eur > 0 && (
             <p className="text-sm text-gray-500">
-              {currentPlan.prix_eur} € / mois · {currentPlan.prix_fcfa?.toLocaleString('fr-FR')} FCFA
+              {currentPlan.prix_eur} \u20ac / mois \u00b7 {currentPlan.prix_fcfa?.toLocaleString('fr-FR')} FCFA
             </p>
           )}
         </div>
@@ -62,8 +63,8 @@ export default function BillingPage() {
           {quota ? (
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Générations utilisées</span>
-                <span className="font-semibold">{quota.count} {quota.limit !== null ? `/ ${quota.limit}` : '/ ∞'}</span>
+                <span className="text-gray-500">G\u00e9n\u00e9rations utilis\u00e9es</span>
+                <span className="font-semibold">{quota.count} {quota.limit !== null ? `/ ${quota.limit}` : '/ \u221e'}</span>
               </div>
               {quota.limit !== null && (
                 <div className="w-full bg-gray-100 rounded-full h-2">
@@ -74,7 +75,7 @@ export default function BillingPage() {
                 </div>
               )}
               {resetDate && (
-                <p className="text-xs text-gray-400">Réinitialisation le {resetDate}</p>
+                <p className="text-xs text-gray-400">R\u00e9initialisation le {resetDate}</p>
               )}
             </div>
           ) : (
@@ -87,7 +88,7 @@ export default function BillingPage() {
 
         {isPro && (
           <div className="bg-white rounded-2xl border border-gray-100 p-6">
-            <h2 className="font-semibold text-gray-900 mb-2">Gérer l'abonnement</h2>
+            <h2 className="font-semibold text-gray-900 mb-2">G\u00e9rer l'abonnement</h2>
             <p className="text-sm text-gray-500 mb-3">Pour annuler ou modifier votre abonnement, contactez-nous.</p>
             <a href="mailto:contact@flashkit.app" className="text-blue-600 text-sm font-semibold hover:underline">
               contact@flashkit.app
