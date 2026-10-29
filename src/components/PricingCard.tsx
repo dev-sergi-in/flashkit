@@ -8,9 +8,10 @@ import Link from 'next/link'
 
 interface PricingCardProps {
   plan: Plan
+  userEmail?: string
 }
 
-export function PricingCard({ plan }: PricingCardProps) {
+export function PricingCard({ plan, userEmail }: PricingCardProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
