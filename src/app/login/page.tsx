@@ -51,7 +51,7 @@ export default function LoginPage() {
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
             <Sparkles className="w-4 h-4 text-white" />
           </div>
-          <span className="font-bold text-gray-900 text-lg">Prompt-Kit AI</span>
+          <span className="font-bold text-gray-900 text-lg">FlashKit</span>
         </Link>
 
         <h1 className="text-2xl font-bold text-gray-900 mb-1">
