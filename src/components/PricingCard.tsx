@@ -16,31 +16,41 @@ export function PricingCard({ plan }: PricingCardProps) {
   const handleCheckout = () => {
     if (plan.id === 'starter' || plan.id === 'enterprise') return
     setLoading(true)
-    const FedaPay = (window as unknown as Record<string, unknown>).FedaPay as {
-      init: (opts: unknown) => void
-      open: () => void
-    }
-    if (!FedaPay) {
-      alert('Erreur de chargement du paiement. Rechargez la page.')
-      setLoading(false)
-      return
-    }
-    FedaPay.init({
-      public_key: process.env.NEXT_PUBLIC_FEDAPAY_PUBLIC_KEY || 'pk_sandbox_o0_RZPmI8ZDMYSejKrCKj4yJ',
-      transaction: {
-        amount: plan.prix_fcfa,
-        description: `Prompt-Kit AI — Plan ${plan.nom}`,
-      },
-      customer: { email: '' },
-      onComplete: (resp: { reason: string }) => {
-        setLoading(false)
-        if (resp.reason !== 'DIALOG DISMISSED') {
-          window.location.href = '/dashboard?success=1&plan=' + plan.id
+
+    const tryOpen = (attempts = 0) => {
+      const FedaPay = (window as unknown as Record<string, unknown>).FedaPay as {
+        init: (opts: unknown) => { open: () => void }
+      } | undefined
+
+      if (!FedaPay) {
+        if (attempts > 10) {
+          alert('Erreur de chargement du paiement. Rechargez la page.')
+          setLoading(false)
+          return
         }
-      },
-    })
-    FedaPay.open()
-    setLoading(false)
+        setTimeout(() => tryOpen(attempts + 1), 300)
+        return
+      }
+
+      const handler = FedaPay.init({
+        public_key: 'pk_sandbox_o0_RZPmI8ZDMYSejKrCKj4yJ',
+        transaction: {
+          amount: plan.prix_fcfa,
+          description: `Prompt-Kit AI — Plan ${plan.nom}`,
+        },
+        customer: { email: '' },
+        onComplete: (resp: { reason: string }) => {
+          setLoading(false)
+          if (resp.reason !== 'DIALOG DISMISSED') {
+            window.location.href = '/dashboard?success=1&plan=' + plan.id
+          }
+        },
+      })
+      setLoading(false)
+      handler.open()
+    }
+
+    tryOpen()
   }
 
   const isFree = plan.id === 'starter'
