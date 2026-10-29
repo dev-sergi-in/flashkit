@@ -1,0 +1,138 @@
+'use client'
+
+import { useState } from 'react'
+import { Sparkles, Loader2, Mail, Lock, Eye, EyeOff } from 'lucide-react'
+import { createSupabaseBrowser } from '@/lib/supabase'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+
+export default function LoginPage() {
+  const [mode, setMode] = useState<'login' | 'register'>('login')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPass, setShowPass] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const router = useRouter()
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setSuccess('')
+    setLoading(true)
+
+    try {
+      const supabase = createSupabaseBrowser()
+      if (mode === 'register') {
+        const { error } = await supabase.auth.signUp({ email, password })
+        if (error) throw error
+        setSuccess('Compte créé ! Vérifiez votre email pour confirmer votre inscription.')
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email, password })
+        if (error) throw error
+        router.push('/dashboard')
+        router.refresh()
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Une erreur est survenue'
+      if (msg === 'Invalid login credentials') setError('Email ou mot de passe incorrect')
+      else if (msg.includes('already registered')) setError('Cet email est déjà utilisé. Connectez-vous.')
+      else setError(msg)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
+        <Link href="/" className="flex items-center gap-2 mb-8">
+          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+            <Sparkles className="w-4 h-4 text-white" />
+          </div>
+          <span className="font-bold text-gray-900 text-lg">Prompt-Kit AI</span>
+        </Link>
+
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">
+          {mode === 'login' ? 'Connexion' : 'Créer un compte'}
+        </h1>
+        <p className="text-gray-500 text-sm mb-6">
+          {mode === 'login'
+            ? 'Accédez à votre espace de génération'
+            : 'Commencez avec 10 générations gratuites'}
+        </p>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                required
+                placeholder="votre@email.com"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Mot de passe</label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type={showPass ? 'text' : 'password'}
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+                minLength={6}
+                placeholder="Min. 6 caractères"
+                className="w-full pl-10 pr-10 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPass(!showPass)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+
+          {error && (
+            <div className="text-red-600 text-sm bg-red-50 border border-red-100 px-3 py-2.5 rounded-xl">
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="text-green-700 text-sm bg-green-50 border border-green-100 px-3 py-2.5 rounded-xl">
+              {success}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-70 text-white font-semibold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+          >
+            {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+            {mode === 'login' ? 'Se connecter' : 'Créer mon compte'}
+          </button>
+        </form>
+
+        <p className="text-center text-sm text-gray-500 mt-6">
+          {mode === 'login' ? "Pas encore de compte ?" : "Déjà un compte ?"}{' '}
+          <button
+            onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(''); setSuccess('') }}
+            className="text-blue-600 font-semibold hover:text-blue-700"
+          >
+            {mode === 'login' ? "S'inscrire" : 'Se connecter'}
+          </button>
+        </p>
+      </div>
+    </div>
+  )
+}
