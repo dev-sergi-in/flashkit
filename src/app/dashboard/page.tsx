@@ -80,7 +80,7 @@ export default function DashboardPage() {
               <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
                 <Sparkles className="w-3.5 h-3.5 text-white" />
               </div>
-              <span className="font-bold text-gray-900">Prompt-Kit AI</span>
+              <span className="font-bold text-gray-900">FlashKit</span>
             </div>
           </div>
           <div className="flex items-center gap-3">
