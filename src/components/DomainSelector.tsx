@@ -26,7 +26,7 @@ const domains = [
   { id: 'autre_custom', emoji: '⚡', label: 'Autre Activité (Personnalisé)' },
 ]
 
-export default function DomainSelector({ value, onChange }: DomainSelectorProps) {
+export function DomainSelector({ value, onChange }: DomainSelectorProps) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
       {domains.map((domain) => {
