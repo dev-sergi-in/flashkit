@@ -4,5 +4,5 @@ export const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 })
 
-export const MODEL = 'claude-3-5-sonnet-20241022'
+export const MODEL = 'claude-sonnet-4-6'
 export const MAX_TOKENS = 1500
