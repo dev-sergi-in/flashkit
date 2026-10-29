@@ -1,4 +1,5 @@
 import type { Plan } from '@/types'
+import { randomUUID } from 'crypto'
 
 export const PLANS: Plan[] = [
   {
@@ -57,7 +58,7 @@ export const PLANS: Plan[] = [
     features: [
       'Accès API direct',
       'Marque blanche',
-      'Intégration Hektor/Apimo',
+      'Intégration sur mesure',
       'SLA garanti',
       'Account manager dédié',
       'Facturation personnalisée',
@@ -66,52 +67,44 @@ export const PLANS: Plan[] = [
   },
 ]
 
-export async function createFedaPayCheckout(planId: 'pro' | 'agence', email?: string) {
+export async function createCinetPayCheckout(
+  planId: 'pro' | 'agence',
+  email?: string
+): Promise<string> {
   const plan = PLANS.find(p => p.id === planId)
   if (!plan) throw new Error('Plan non trouvé')
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://flashkit.vercel.app'
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://immo-prompt-ai.vercel.app'
+  const transactionId = randomUUID().replace(/-/g, '').slice(0, 20)
 
-  const isSandbox = (process.env.FEDAPAY_SECRET_KEY || '').includes('sandbox')
-  const baseUrl = isSandbox ? 'https://sandbox.fedapay.com/v1' : 'https://api.fedapay.com/v1'
-  const checkoutUrl = isSandbox ? 'https://sandbox.checkout.fedapay.com' : 'https://checkout.fedapay.com'
-
-  const txRes = await fetch(`${baseUrl}/transactions`, {
+  const res = await fetch('https://api-checkout.cinetpay.com/v2/payment', {
     method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${process.env.FEDAPAY_SECRET_KEY}`,
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      description: `FlashKit — Plan ${plan.nom}`,
+      apikey: process.env.CINETPAY_API_KEY,
+      site_id: process.env.CINETPAY_SITE_ID,
+      transaction_id: transactionId,
       amount: plan.prix_fcfa,
-      currency: { iso: 'XOF' },
-      callback_url: `${appUrl}/dashboard?success=1&plan=${planId}`,
-      customer: { email: email || '' },
-      metadata: { planId },
+      currency: 'XOF',
+      description: `Immo-Prompt AI — Plan ${plan.nom}`,
+      return_url: `${appUrl}/dashboard?success=1&plan=${planId}`,
+      notify_url: `${appUrl}/api/stripe/webhook`,
+      channels: 'ALL',
+      customer_email: email || '',
+      metadata: JSON.stringify({ planId, email }),
     }),
   })
 
-  if (!txRes.ok) {
-    const err = await txRes.text()
-    throw new Error(`FedaPay error: ${err}`)
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(`CinetPay error: ${err}`)
   }
 
-  const txData = await txRes.json()
-  const txId = txData.v1?.transaction?.id
+  const data = await res.json()
 
-  const tokenRes = await fetch(`${baseUrl}/transactions/${txId}/token`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${process.env.FEDAPAY_SECRET_KEY}`,
-      'Content-Type': 'application/json',
-    },
-  })
+  if (data.code !== '201') {
+    throw new Error(`CinetPay: ${data.message || 'Erreur inconnue'}`)
+  }
 
-  if (!tokenRes.ok) throw new Error('Impossible de générer le lien de paiement')
-
-  const tokenData = await tokenRes.json()
-  const token = tokenData.token
-
-  return `${checkoutUrl}/?token=${token}`
+  return data.data.payment_url
 }
