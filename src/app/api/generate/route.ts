@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
         'X-Title': 'Immo-Prompt AI',
       },
       body: JSON.stringify({
-        model: 'anthropic/claude-sonnet-4-6',
+        model: 'anthropic/claude-3.5-haiku-20241022',
         max_tokens: 1500,
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
