@@ -6,11 +6,12 @@ import { Sparkles, ArrowLeft } from 'lucide-react'
 import { PropertyForm } from '@/components/PropertyForm'
 import { ResultsTabs } from '@/components/ResultsTabs'
 import { ExportButton } from '@/components/ExportButton'
+import { useQuota } from '@/hooks/useQuota'
 import type { GeneratedKit } from '@/types'
 
 export default function DashboardPage() {
   const [kit, setKit] = useState<GeneratedKit | null>(null)
-  const [creditsLeft] = useState<number>(3)
+  const { remaining, canGenerate, consume } = useQuota()
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -43,7 +44,7 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
-            <PropertyForm onResult={setKit} creditsLeft={creditsLeft} />
+            <PropertyForm onResult={(k) => { setKit(k); consume() }} creditsLeft={remaining} canGenerate={canGenerate} />
           </div>
 
           <div>
