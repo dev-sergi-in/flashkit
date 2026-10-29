@@ -72,14 +72,18 @@ export async function createFedaPayCheckout(planId: 'pro' | 'agence', email?: st
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://immo-prompt-ai.vercel.app'
 
-  const txRes = await fetch('https://api.fedapay.com/v1/transactions', {
+  const isSandbox = (process.env.FEDAPAY_SECRET_KEY || '').includes('sandbox')
+  const baseUrl = isSandbox ? 'https://sandbox.fedapay.com/v1' : 'https://api.fedapay.com/v1'
+  const checkoutUrl = isSandbox ? 'https://sandbox.checkout.fedapay.com' : 'https://checkout.fedapay.com'
+
+  const txRes = await fetch(`${baseUrl}/transactions`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${process.env.FEDAPAY_SECRET_KEY}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      description: `Immo-Prompt AI — Plan ${plan.nom}`,
+      description: `Prompt-Kit AI — Plan ${plan.nom}`,
       amount: plan.prix_fcfa,
       currency: { iso: 'XOF' },
       callback_url: `${appUrl}/dashboard?success=1&plan=${planId}`,
@@ -96,7 +100,7 @@ export async function createFedaPayCheckout(planId: 'pro' | 'agence', email?: st
   const txData = await txRes.json()
   const txId = txData.v1?.transaction?.id
 
-  const tokenRes = await fetch(`https://api.fedapay.com/v1/transactions/${txId}/token`, {
+  const tokenRes = await fetch(`${baseUrl}/transactions/${txId}/token`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${process.env.FEDAPAY_SECRET_KEY}`,
@@ -109,5 +113,5 @@ export async function createFedaPayCheckout(planId: 'pro' | 'agence', email?: st
   const tokenData = await tokenRes.json()
   const token = tokenData.token
 
-  return `https://checkout.fedapay.com/?token=${token}`
+  return `${checkoutUrl}/?token=${token}`
 }
