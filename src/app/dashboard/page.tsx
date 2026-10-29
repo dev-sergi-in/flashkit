@@ -25,7 +25,7 @@ export default function DashboardPage() {
               <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
                 <Sparkles className="w-3.5 h-3.5 text-white" />
               </div>
-              <span className="font-bold text-gray-900">Immo-Prompt AI</span>
+              <span className="font-bold text-gray-900">Prompt-Kit AI</span>
             </div>
           </div>
           <Link href="/pricing" className="text-sm text-blue-600 font-semibold hover:text-blue-700">
@@ -38,7 +38,7 @@ export default function DashboardPage() {
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Générateur de kit marketing</h1>
           <p className="text-gray-500 text-sm mt-1">
-            Remplissez les caractéristiques du bien pour générer votre contenu multi-canal.
+            Choisissez votre secteur, remplissez les informations et générez votre contenu multi-canal.
           </p>
         </div>
 
