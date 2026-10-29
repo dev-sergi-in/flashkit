@@ -1,7 +1,7 @@
 import type { GeneratedKit } from '@/types'
 
 export function kitToText(kit: GeneratedKit): string {
-  return `=== IMMO-PROMPT AI — KIT MARKETING ===
+  return `=== Prompt-Kit AI — KIT MARKETING ===
 Généré le ${new Date().toLocaleDateString('fr-FR')}
 
 --- ANNONCE WEB SEO ---
@@ -48,7 +48,7 @@ export function downloadPDF(kit: GeneratedKit) {
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Kit Marketing — IMMO-PROMPT AI</title>
+<title>Kit Marketing — Prompt-Kit AI</title>
 <style>
   body { font-family: Arial, sans-serif; margin: 0; padding: 0; color: #111827; }
   .header { background: #2563eb; color: white; padding: 20px 30px; }
@@ -64,7 +64,7 @@ export function downloadPDF(kit: GeneratedKit) {
 </head>
 <body>
 <div class="header">
-  <h1>IMMO-PROMPT AI</h1>
+  <h1>Prompt-Kit AI</h1>
   <p>Kit Marketing — ${new Date().toLocaleDateString('fr-FR')}</p>
 </div>
 <div class="content">
