@@ -1,5 +1,48 @@
 export type Ton = 'Standard' | 'Prestige' | 'Accessible'
 
+export type DomainId =
+  | 'immobilier'
+  | 'ecommerce'
+  | 'automobile'
+  | 'services'
+  | 'digital'
+  | 'restauration_evenements'
+  | 'beaute_bienetre'
+  | 'materiel_pro'
+  | 'education_ecoles'
+  | 'mode_artisanat'
+  | 'sante_parapharmacie'
+  | 'agriculture_agro'
+  | 'voyage_logistique'
+  | 'finance_juridique'
+  | 'sport_fitness'
+  | 'energie_solaire'
+  | 'art_divertissement'
+  | 'autre_custom'
+
+export interface DomainField {
+  name: string
+  label: string
+  placeholder: string
+  required: boolean
+  type: 'text' | 'textarea' | 'select'
+  options?: string[]
+}
+
+export interface Domain {
+  id: DomainId
+  label: string
+  fields: DomainField[]
+  promptContext: string
+}
+
+export interface BusinessInput {
+  domain: DomainId
+  fields: Record<string, string>
+  ton: Ton
+}
+
+// Legacy — kept for backwards compat
 export interface PropertyInput {
   bien: string
   surface: string
@@ -55,7 +98,7 @@ export interface Plan {
 }
 
 export interface GenerateRequest {
-  property: PropertyInput
+  input: BusinessInput
   userId?: string
 }
 
