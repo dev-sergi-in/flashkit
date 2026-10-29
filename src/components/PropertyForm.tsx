@@ -8,7 +8,7 @@ import { DomainSelector } from '@/components/DomainSelector'
 import { getDomain } from '@/lib/domains'
 
 interface PropertyFormProps {
-  onResult: (kit: GeneratedKit) => void
+  onResult: (kit: GeneratedKit, domain?: string, domainLabel?: string) => void
   creditsLeft?: number | null
   canGenerate?: boolean
 }
@@ -74,7 +74,7 @@ export function PropertyForm({ onResult, creditsLeft, canGenerate = true }: Prop
         throw new Error(data.error || 'Erreur lors de la génération')
       }
 
-      onResult(data.kit)
+      onResult(data.kit, domain, domainConfig.label)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue')
     } finally {
