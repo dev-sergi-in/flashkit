@@ -140,15 +140,17 @@ export async function POST(request: NextRequest) {
         }).eq('user_id', user.id)
       }
 
-      // Sauvegarder en historique
-      await supabase.from('generations').insert({
-        id: generation_id,
-        user_id: user.id,
-        domain,
-        ton,
-        kit,
-        created_at: new Date().toISOString(),
-      }).then(() => {}).catch(() => {}) // non bloquant
+      // Sauvegarder en historique (non bloquant)
+      try {
+        await supabase.from('generations').insert({
+          id: generation_id,
+          user_id: user.id,
+          domain,
+          ton,
+          kit,
+          created_at: new Date().toISOString(),
+        })
+      } catch { /* ignoré */ }
     }
 
     return NextResponse.json({
