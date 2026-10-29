@@ -37,6 +37,9 @@ export default function HomePage() {
             <Link href="/pricing" className="text-sm text-gray-600 hover:text-gray-900 font-medium">
               Tarifs
             </Link>
+            <Link href="/contact" className="text-sm text-gray-600 hover:text-gray-900 font-medium">
+              Contact
+            </Link>
             <Link
               href="/login"
               className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
@@ -119,8 +122,21 @@ export default function HomePage() {
         </div>
       </section>
 
-      <footer className="border-t border-gray-100 py-8 text-center text-sm text-gray-400">
-        © 2026 FlashKit — Tous droits réservés
+      <footer className="border-t border-gray-100 py-8">
+        <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-400">
+          <span>© 2026 FlashKit — Tous droits réservés</span>
+          <div className="flex items-center gap-6">
+            <Link href="/pricing" className="hover:text-gray-700 transition-colors">
+              Tarifs
+            </Link>
+            <Link href="/contact" className="hover:text-gray-700 transition-colors">
+              Contact
+            </Link>
+            <Link href="/login" className="hover:text-gray-700 transition-colors">
+              Se connecter
+            </Link>
+          </div>
+        </div>
       </footer>
     </div>
   )
