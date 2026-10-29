@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import type { GeneratedKit } from '@/types'
+import type { GeneratedKit, DomainId } from '@/types'
 import { sanitizeInput } from '@/lib/validation'
 import { Loader2, Sparkles } from 'lucide-react'
 import { DomainSelector } from '@/components/DomainSelector'
@@ -14,7 +14,7 @@ interface PropertyFormProps {
 }
 
 export function PropertyForm({ onResult, creditsLeft, canGenerate = true }: PropertyFormProps) {
-  const [domain, setDomain] = useState<string>('immobilier')
+  const [domain, setDomain] = useState<DomainId>('immobilier')
   const [fields, setFields] = useState<Record<string, string>>({})
   const [ton, setTon] = useState<string>('Standard')
   const [loading, setLoading] = useState(false)
@@ -23,7 +23,7 @@ export function PropertyForm({ onResult, creditsLeft, canGenerate = true }: Prop
   const domainConfig = getDomain(domain)
 
   const handleDomainChange = (newDomain: string) => {
-    setDomain(newDomain)
+    setDomain(newDomain as DomainId)
     setFields({})
     setError(null)
   }
