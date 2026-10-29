@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
         'X-Title': 'Immo-Prompt AI',
       },
       body: JSON.stringify({
-        model: 'anthropic/claude-haiku-4.5',
+        model: 'google/gemma-4-31b-it:free',
         max_tokens: 1500,
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
