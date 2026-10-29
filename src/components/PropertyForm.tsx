@@ -1,9 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import type { PropertyInput, GeneratedKit, Ton } from '@/types'
+import type { GeneratedKit } from '@/types'
 import { sanitizeInput } from '@/lib/validation'
 import { Loader2, Sparkles } from 'lucide-react'
+import { DomainSelector } from '@/components/DomainSelector'
+import { getDomain } from '@/lib/domains'
 
 interface PropertyFormProps {
   onResult: (kit: GeneratedKit) => void
@@ -11,49 +13,39 @@ interface PropertyFormProps {
   canGenerate?: boolean
 }
 
-const defaultValues: PropertyInput = {
-  bien: '',
-  surface: '',
-  localisation: '',
-  prix: '',
-  points_forts: '',
-  ton: 'Standard',
-  chambres: '',
-  etage: '',
-  annee_construction: '',
-}
-
 export function PropertyForm({ onResult, creditsLeft, canGenerate = true }: PropertyFormProps) {
-  const [form, setForm] = useState<PropertyInput>(defaultValues)
+  const [domain, setDomain] = useState<string>('immobilier')
+  const [fields, setFields] = useState<Record<string, string>>({})
+  const [ton, setTon] = useState<string>('Standard')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  const domainConfig = getDomain(domain)
+
+  const handleDomainChange = (newDomain: string) => {
+    setDomain(newDomain)
+    setFields({})
+    setError(null)
+  }
+
+  const handleFieldChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target
-    setForm(prev => ({ ...prev, [name]: value }))
+    setFields(prev => ({ ...prev, [name]: value }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
 
-    if (!form.bien || !form.surface || !form.localisation || !form.prix || !form.points_forts) {
+    const missingRequired = domainConfig.fields
+      .filter(f => f.required)
+      .some(f => !fields[f.name] || fields[f.name].trim() === '')
+
+    if (missingRequired) {
       setError('Veuillez remplir tous les champs obligatoires.')
       return
-    }
-
-    const sanitized: PropertyInput = {
-      bien: sanitizeInput(form.bien),
-      surface: sanitizeInput(form.surface),
-      localisation: sanitizeInput(form.localisation),
-      prix: sanitizeInput(form.prix),
-      points_forts: sanitizeInput(form.points_forts),
-      ton: form.ton as Ton,
-      chambres: form.chambres ? sanitizeInput(form.chambres) : undefined,
-      etage: form.etage ? sanitizeInput(form.etage) : undefined,
-      annee_construction: form.annee_construction ? sanitizeInput(form.annee_construction) : undefined,
     }
 
     if (!canGenerate) {
@@ -61,12 +53,19 @@ export function PropertyForm({ onResult, creditsLeft, canGenerate = true }: Prop
       return
     }
 
+    const sanitizedFields: Record<string, string> = {}
+    for (const [key, value] of Object.entries(fields)) {
+      if (value && value.trim() !== '') {
+        sanitizedFields[key] = sanitizeInput(value)
+      }
+    }
+
     setLoading(true)
     try {
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ property: sanitized }),
+        body: JSON.stringify({ input: { domain, fields: sanitizedFields, ton } }),
       })
 
       const data = await res.json()
@@ -94,118 +93,53 @@ export function PropertyForm({ onResult, creditsLeft, canGenerate = true }: Prop
         )}
       </div>
 
+      <DomainSelector value={domain} onChange={handleDomainChange} />
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="sm:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Type de bien <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="bien"
-            value={form.bien}
-            onChange={handleChange}
-            placeholder="Ex: Villa contemporaine F5, Studio vue mer..."
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Surface <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="surface"
-            value={form.surface}
-            onChange={handleChange}
-            placeholder="Ex: 180m²"
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Localisation <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="localisation"
-            value={form.localisation}
-            onChange={handleChange}
-            placeholder="Ex: Lomé, Baguida"
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Prix <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="prix"
-            value={form.prix}
-            onChange={handleChange}
-            placeholder="Ex: 120 000 000 FCFA"
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
+        {domainConfig.fields.map(field => (
+          <div
+            key={field.name}
+            className={field.type === 'textarea' ? 'sm:col-span-2' : ''}
+          >
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {field.label}
+              {field.required && <span className="text-red-500"> *</span>}
+            </label>
+            {field.type === 'textarea' ? (
+              <textarea
+                name={field.name}
+                value={fields[field.name] ?? ''}
+                onChange={handleFieldChange}
+                rows={3}
+                placeholder={field.placeholder}
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                required={field.required}
+              />
+            ) : (
+              <input
+                type="text"
+                name={field.name}
+                value={fields[field.name] ?? ''}
+                onChange={handleFieldChange}
+                placeholder={field.placeholder}
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required={field.required}
+              />
+            )}
+          </div>
+        ))}
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Ton du message</label>
           <select
-            name="ton"
-            value={form.ton}
-            onChange={handleChange}
+            value={ton}
+            onChange={e => setTon(e.target.value)}
             className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
           >
             <option value="Standard">Standard</option>
             <option value="Prestige">Prestige</option>
             <option value="Accessible">Accessible</option>
           </select>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Chambres</label>
-          <input
-            type="text"
-            name="chambres"
-            value={form.chambres}
-            onChange={handleChange}
-            placeholder="Ex: 4 chambres"
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Année de construction</label>
-          <input
-            type="text"
-            name="annee_construction"
-            value={form.annee_construction}
-            onChange={handleChange}
-            placeholder="Ex: 2022"
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <div className="sm:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Points forts <span className="text-red-500">*</span>
-          </label>
-          <textarea
-            name="points_forts"
-            value={form.points_forts}
-            onChange={handleChange}
-            rows={3}
-            placeholder="Ex: Piscine, Smart Home, Garage 3 voitures, Sécurité 24/7, Vue panoramique..."
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-            required
-          />
         </div>
       </div>
 
