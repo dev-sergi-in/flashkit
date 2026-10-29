@@ -70,7 +70,7 @@ export async function createFedaPayCheckout(planId: 'pro' | 'agence', email?: st
   const plan = PLANS.find(p => p.id === planId)
   if (!plan) throw new Error('Plan non trouvé')
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://immo-prompt-ai.vercel.app'
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://flashkit.vercel.app'
 
   const isSandbox = (process.env.FEDAPAY_SECRET_KEY || '').includes('sandbox')
   const baseUrl = isSandbox ? 'https://sandbox.fedapay.com/v1' : 'https://api.fedapay.com/v1'
@@ -83,7 +83,7 @@ export async function createFedaPayCheckout(planId: 'pro' | 'agence', email?: st
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      description: `Prompt-Kit AI — Plan ${plan.nom}`,
+      description: `FlashKit — Plan ${plan.nom}`,
       amount: plan.prix_fcfa,
       currency: { iso: 'XOF' },
       callback_url: `${appUrl}/dashboard?success=1&plan=${planId}`,
