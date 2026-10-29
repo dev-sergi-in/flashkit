@@ -15,10 +15,6 @@ export function ExportButton({ kit, isPro = false }: ExportButtonProps) {
   const [open, setOpen] = useState(false)
 
   const handleExport = async (format: 'txt' | 'pdf') => {
-    if (format === 'pdf' && !isPro) {
-      alert('Export PDF disponible sur le plan Pro ou supérieur.')
-      return
-    }
     setLoading(format)
     try {
       if (format === 'txt') downloadText(kit)
@@ -43,7 +39,7 @@ export function ExportButton({ kit, isPro = false }: ExportButtonProps) {
         <div className="absolute right-0 mt-1 bg-white border border-gray-100 rounded-xl shadow-lg z-10 py-1 min-w-36">
           {[
             { format: 'txt' as const, label: '.TXT', icon: FileText, free: true },
-            { format: 'pdf' as const, label: '.PDF', icon: FileDown, free: false },
+            { format: 'pdf' as const, label: '.PDF', icon: FileDown, free: true },
           ].map(({ format, label, icon: Icon, free }) => (
             <button
               key={format}
