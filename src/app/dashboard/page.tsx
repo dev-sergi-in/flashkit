@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import Link from 'next/link'
-import { Sparkles, ArrowLeft, LogOut, User, Crown } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
+import { Sparkles, ArrowLeft, LogOut, User, Crown, CheckCircle, X } from 'lucide-react'
 import { PropertyForm } from '@/components/PropertyForm'
 import { ResultsTabs } from '@/components/ResultsTabs'
 import { ExportButton } from '@/components/ExportButton'
@@ -18,30 +19,50 @@ interface QuotaInfo {
   email?: string
 }
 
-export default function DashboardPage() {
+function SuccessBanner({ plan, onClose }: { plan: string; onClose: () => void }) {
+  return (
+    <div className="mb-6 flex items-center justify-between gap-3 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl text-sm">
+      <div className="flex items-center gap-2">
+        <CheckCircle className="w-4 h-4 shrink-0" />
+        <span>Paiement réussi ! Votre plan <strong className="capitalize">{plan}</strong> est maintenant actif.</span>
+      </div>
+      <button onClick={onClose} className="text-green-600 hover:text-green-800">
+        <X className="w-4 h-4" />
+      </button>
+    </div>
+  )
+}
+
+function DashboardContent() {
   const [kit, setKit] = useState<GeneratedKit | null>(null)
   const [quota, setQuota] = useState<QuotaInfo>({ plan: 'starter', remaining: null, canGenerate: true })
   const [historyRefresh, setHistoryRefresh] = useState(0)
+  const [showSuccess, setShowSuccess] = useState(false)
+  const [successPlan, setSuccessPlan] = useState("")
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   const fetchQuota = useCallback(async () => {
     try {
       const res = await fetch('/api/quota')
       if (res.ok) {
         const data = await res.json()
-        setQuota({
-          plan: data.plan,
-          remaining: data.remaining,
-          canGenerate: data.canGenerate,
-          email: data.email,
-        })
+        setQuota({ plan: data.plan, remaining: data.remaining, canGenerate: data.canGenerate, email: data.email })
       }
-    } catch {
-      // fallback — keep defaults
-    }
+    } catch {}
   }, [])
 
-  useEffect(() => { fetchQuota() }, [fetchQuota])
+  useEffect(() => {
+    fetchQuota()
+    const success = searchParams.get('success')
+    const plan = searchParams.get('plan')
+    if (success === '1' && plan) {
+      setShowSuccess(true)
+      setSuccessPlan(plan)
+      fetchQuota()
+      router.replace('/dashboard')
+    }
+  }, [fetchQuota, searchParams, router])
 
   const handleLogout = async () => {
     const supabase = createSupabaseBrowser()
@@ -68,6 +89,8 @@ export default function DashboardPage() {
     }
   }
 
+  const isPro = quota.plan !== 'starter'
+
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="border-b border-gray-100 bg-white">
@@ -90,7 +113,7 @@ export default function DashboardPage() {
                 {quota.email}
               </div>
             )}
-            {quota.plan === 'starter' ? (
+            {!isPro ? (
               <Link href="/pricing" className="flex items-center gap-1.5 text-xs text-blue-600 font-semibold hover:text-blue-700 bg-blue-50 px-2.5 py-1.5 rounded-lg">
                 <Crown className="w-3.5 h-3.5" />
                 Passer Pro
@@ -98,11 +121,7 @@ export default function DashboardPage() {
             ) : (
               <span className="text-xs text-blue-600 font-semibold bg-blue-50 px-2.5 py-1.5 rounded-lg capitalize">{quota.plan}</span>
             )}
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 transition-colors"
-              title="Déconnexion"
-            >
+            <button onClick={handleLogout} className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 transition-colors" title="Déconnexion">
               <LogOut className="w-4 h-4" />
             </button>
           </div>
@@ -110,11 +129,13 @@ export default function DashboardPage() {
       </nav>
 
       <div className="max-w-5xl mx-auto px-4 py-8">
+        {showSuccess && (
+          <SuccessBanner plan={successPlan} onClose={() => setShowSuccess(false)} />
+        )}
+
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Générateur de kit marketing</h1>
-          <p className="text-gray-500 text-sm mt-1">
-            Choisissez votre secteur, remplissez les informations et générez votre contenu multi-canal.
-          </p>
+          <p className="text-gray-500 text-sm mt-1">Choisissez votre secteur, remplissez les informations et générez votre contenu multi-canal.</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -125,13 +146,12 @@ export default function DashboardPage() {
               canGenerate={quota.canGenerate}
             />
           </div>
-
           <div>
             {kit ? (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h2 className="text-sm font-semibold text-gray-700">Kit généré</h2>
-                  <ExportButton kit={kit} />
+                  <ExportButton kit={kit} isPro={isPro} />
                 </div>
                 <ResultsTabs kit={kit} />
               </div>
@@ -152,5 +172,13 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense>
+      <DashboardContent />
+    </Suspense>
   )
 }
