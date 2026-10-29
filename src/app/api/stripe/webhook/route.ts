@@ -1,36 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { stripe } from '@/lib/stripe'
-import type Stripe from 'stripe'
 
 export async function POST(request: NextRequest) {
-  const body = await request.text()
-  const sig = request.headers.get('stripe-signature')!
-
-  let event: Stripe.Event
   try {
-    event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!)
-  } catch (err) {
-    console.error('[webhook] Signature invalide:', err)
-    return NextResponse.json({ error: 'Signature invalide' }, { status: 400 })
-  }
+    const body = await request.json()
+    const event = body?.name
+    const transaction = body?.entity
 
-  switch (event.type) {
-    case 'checkout.session.completed': {
-      const session = event.data.object as Stripe.Checkout.Session
-      console.log('[webhook] Checkout completed:', session.id, session.metadata?.planId)
-      break
+    if (event === 'transaction.approved' && transaction) {
+      const planId = transaction.metadata?.planId
+      const email = transaction.customer?.email
+      console.log('[webhook] Payment approved:', planId, email)
     }
-    case 'customer.subscription.deleted': {
-      const sub = event.data.object as Stripe.Subscription
-      console.log('[webhook] Subscription deleted:', sub.id)
-      break
-    }
-    case 'invoice.payment_failed': {
-      const invoice = event.data.object as Stripe.Invoice
-      console.log('[webhook] Payment failed:', invoice.id)
-      break
-    }
-  }
 
-  return NextResponse.json({ received: true })
+    return NextResponse.json({ received: true })
+  } catch (error) {
+    console.error('[webhook]', error)
+    return NextResponse.json({ error: 'Webhook error' }, { status: 400 })
+  }
 }
