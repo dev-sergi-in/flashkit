@@ -31,7 +31,7 @@ export default function HomePage() {
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
-            <span className="font-bold text-gray-900 text-lg">Prompt-Kit AI</span>
+            <span className="font-bold text-gray-900 text-lg">FlashKit</span>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/pricing" className="text-sm text-gray-600 hover:text-gray-900 font-medium">
@@ -120,7 +120,7 @@ export default function HomePage() {
       </section>
 
       <footer className="border-t border-gray-100 py-8 text-center text-sm text-gray-400">
-        © 2026 Prompt-Kit AI — Tous droits réservés
+        © 2026 FlashKit — Tous droits réservés
       </footer>
     </div>
   )
