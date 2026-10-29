@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
         'X-Title': 'Immo-Prompt AI',
       },
       body: JSON.stringify({
-        model: 'google/gemma-4-31b-it:free',
+        model: 'nvidia/nemotron-3-ultra-550b-a55b:free',
         max_tokens: 1500,
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
