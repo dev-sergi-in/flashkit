@@ -1,15 +1,13 @@
 'use client'
 
 import { useState, useEffect, useCallback, Suspense } from 'react'
-import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
-import { Sparkles, ArrowLeft, LogOut, User, Crown, CheckCircle, X } from 'lucide-react'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { Sparkles, CheckCircle, X } from 'lucide-react'
 import { PropertyForm } from '@/components/PropertyForm'
 import { ResultsTabs } from '@/components/ResultsTabs'
 import { ExportButton } from '@/components/ExportButton'
 import { HistoryPanel } from '@/components/HistoryPanel'
-import { createSupabaseBrowser } from '@/lib/supabase'
-import { useRouter } from 'next/navigation'
+import { DashboardNav } from '@/components/DashboardNav'
 import type { GeneratedKit } from '@/types'
 
 interface QuotaInfo {
@@ -26,9 +24,7 @@ function SuccessBanner({ plan, onClose }: { plan: string; onClose: () => void })
         <CheckCircle className="w-4 h-4 shrink-0" />
         <span>Paiement réussi ! Votre plan <strong className="capitalize">{plan}</strong> est maintenant actif.</span>
       </div>
-      <button onClick={onClose} className="text-green-600 hover:text-green-800">
-        <X className="w-4 h-4" />
-      </button>
+      <button onClick={onClose}><X className="w-4 h-4 text-green-600 hover:text-green-800" /></button>
     </div>
   )
 }
@@ -38,7 +34,7 @@ function DashboardContent() {
   const [quota, setQuota] = useState<QuotaInfo>({ plan: 'starter', remaining: null, canGenerate: true })
   const [historyRefresh, setHistoryRefresh] = useState(0)
   const [showSuccess, setShowSuccess] = useState(false)
-  const [successPlan, setSuccessPlan] = useState("")
+  const [successPlan, setSuccessPlan] = useState('')
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -64,13 +60,6 @@ function DashboardContent() {
     }
   }, [fetchQuota, searchParams, router])
 
-  const handleLogout = async () => {
-    const supabase = createSupabaseBrowser()
-    await supabase.auth.signOut()
-    router.push('/login')
-    router.refresh()
-  }
-
   const handleGenerated = async (k: GeneratedKit, domain?: string, domainLabel?: string) => {
     setKit(k)
     setQuota(q => ({
@@ -93,45 +82,10 @@ function DashboardContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="border-b border-gray-100 bg-white">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="text-gray-400 hover:text-gray-600">
-              <ArrowLeft className="w-4 h-4" />
-            </Link>
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
-                <Sparkles className="w-3.5 h-3.5 text-white" />
-              </div>
-              <span className="font-bold text-gray-900">FlashKit</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            {quota.email && (
-              <div className="hidden sm:flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-2.5 py-1.5 rounded-lg">
-                <User className="w-3.5 h-3.5" />
-                {quota.email}
-              </div>
-            )}
-            {!isPro ? (
-              <Link href="/pricing" className="flex items-center gap-1.5 text-xs text-blue-600 font-semibold hover:text-blue-700 bg-blue-50 px-2.5 py-1.5 rounded-lg">
-                <Crown className="w-3.5 h-3.5" />
-                Passer Pro
-              </Link>
-            ) : (
-              <span className="text-xs text-blue-600 font-semibold bg-blue-50 px-2.5 py-1.5 rounded-lg capitalize">{quota.plan}</span>
-            )}
-            <button onClick={handleLogout} className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 transition-colors" title="Déconnexion">
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </nav>
+      <DashboardNav email={quota.email} plan={quota.plan} />
 
       <div className="max-w-5xl mx-auto px-4 py-8">
-        {showSuccess && (
-          <SuccessBanner plan={successPlan} onClose={() => setShowSuccess(false)} />
-        )}
+        {showSuccess && <SuccessBanner plan={successPlan} onClose={() => setShowSuccess(false)} />}
 
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Générateur de kit marketing</h1>
@@ -176,9 +130,5 @@ function DashboardContent() {
 }
 
 export default function DashboardPage() {
-  return (
-    <Suspense>
-      <DashboardContent />
-    </Suspense>
-  )
+  return <Suspense><DashboardContent /></Suspense>
 }
