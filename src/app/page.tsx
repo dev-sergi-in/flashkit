@@ -29,7 +29,7 @@ export default function HomePage() {
       <section className="max-w-6xl mx-auto px-4 pt-20 pb-16 text-center">
         <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 text-xs font-semibold px-4 py-2 rounded-full mb-6">
           <Sparkles className="w-3.5 h-3.5" />
-          Propulsé par Claude 3.5 Sonnet
+          Propulsé par Claude Sonnet 4.6
         </div>
         <h1 className="text-5xl font-bold text-gray-900 mb-6 leading-tight">
           Votre kit marketing immobilier<br />
