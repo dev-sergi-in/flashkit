@@ -38,7 +38,7 @@ export default function HomePage() {
               Tarifs
             </Link>
             <Link
-              href="/dashboard"
+              href="/login"
               className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
             >
               Essayer gratuitement
@@ -62,7 +62,7 @@ export default function HomePage() {
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
-            href="/dashboard"
+            href="/login"
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-xl text-lg transition-colors shadow-lg shadow-blue-200"
           >
             Générer gratuitement <ArrowRight className="w-5 h-5" />
@@ -111,7 +111,7 @@ export default function HomePage() {
           <h2 className="text-3xl font-bold mb-4">Prêt à transformer votre contenu marketing ?</h2>
           <p className="text-blue-100 mb-8">Rejoignez les professionnels qui ont modernisé leur rédaction.</p>
           <Link
-            href="/dashboard"
+            href="/login"
             className="inline-flex items-center gap-2 bg-white text-blue-600 font-bold px-8 py-4 rounded-xl hover:bg-blue-50 transition-colors"
           >
             Commencer gratuitement <ArrowRight className="w-5 h-5" />
