@@ -1,9 +1,4 @@
-import Stripe from 'stripe'
 import type { Plan } from '@/types'
-
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-06-20',
-})
 
 export const PLANS: Plan[] = [
   {
@@ -27,11 +22,10 @@ export const PLANS: Plan[] = [
     prix_eur: 29,
     prix_fcfa: 19000,
     generations: null,
-    stripe_price_id: process.env.STRIPE_PRICE_PRO,
     features: [
       'Générations illimitées',
       'Tous les formats',
-      'Export PDF & Word',
+      'Export PDF',
       'Historique des générations',
       'Support prioritaire',
     ],
@@ -44,11 +38,10 @@ export const PLANS: Plan[] = [
     prix_eur: 79,
     prix_fcfa: 50000,
     generations: null,
-    stripe_price_id: process.env.STRIPE_PRICE_AGENCE,
     features: [
       '5 accès collaborateurs',
       'Générations illimitées',
-      'Export PDF, Word & Excel',
+      'Export PDF',
       'Branding personnalisé',
       'Tableau de bord agence',
       'Support dédié',
@@ -72,3 +65,49 @@ export const PLANS: Plan[] = [
     cta: 'Nous contacter',
   },
 ]
+
+export async function createFedaPayCheckout(planId: 'pro' | 'agence', email?: string) {
+  const plan = PLANS.find(p => p.id === planId)
+  if (!plan) throw new Error('Plan non trouvé')
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://immo-prompt-ai.vercel.app'
+
+  const txRes = await fetch('https://api.fedapay.com/v1/transactions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.FEDAPAY_SECRET_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      description: `Immo-Prompt AI — Plan ${plan.nom}`,
+      amount: plan.prix_fcfa,
+      currency: { iso: 'XOF' },
+      callback_url: `${appUrl}/dashboard?success=1&plan=${planId}`,
+      customer: { email: email || '' },
+      metadata: { planId },
+    }),
+  })
+
+  if (!txRes.ok) {
+    const err = await txRes.text()
+    throw new Error(`FedaPay error: ${err}`)
+  }
+
+  const txData = await txRes.json()
+  const txId = txData.v1?.transaction?.id
+
+  const tokenRes = await fetch(`https://api.fedapay.com/v1/transactions/${txId}/token`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.FEDAPAY_SECRET_KEY}`,
+      'Content-Type': 'application/json',
+    },
+  })
+
+  if (!tokenRes.ok) throw new Error('Impossible de générer le lien de paiement')
+
+  const tokenData = await tokenRes.json()
+  const token = tokenData.token
+
+  return `https://checkout.fedapay.com/?token=${token}`
+}
