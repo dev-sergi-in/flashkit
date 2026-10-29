@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { anthropic, MODEL, MAX_TOKENS } from '@/lib/anthropic'
 import { SYSTEM_PROMPT, buildUserMessage } from '@/lib/prompt'
 import type { GeneratedKit, ApiError } from '@/types'
 import { randomUUID } from 'crypto'
@@ -37,14 +36,31 @@ export async function POST(request: NextRequest) {
     const { property } = parsed.data
     const userMessage = buildUserMessage(property)
 
-    const response = await anthropic.messages.create({
-      model: MODEL,
-      max_tokens: MAX_TOKENS,
-      system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: userMessage }],
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL || 'https://immo-prompt-ai.vercel.app',
+        'X-Title': 'Immo-Prompt AI',
+      },
+      body: JSON.stringify({
+        model: 'anthropic/claude-sonnet-4-6',
+        max_tokens: 1500,
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: userMessage },
+        ],
+      }),
     })
 
-    const text = response.content[0].type === 'text' ? response.content[0].text : null
+    if (!response.ok) {
+      const err = await response.text()
+      throw new Error(`OpenRouter error ${response.status}: ${err}`)
+    }
+
+    const data = await response.json()
+    const text = data.choices?.[0]?.message?.content
     if (!text) throw new Error('Réponse vide de l\'API')
 
     let kit: GeneratedKit
