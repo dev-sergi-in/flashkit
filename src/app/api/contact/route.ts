@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { sendContactEmail } from '@/lib/email'
 
 export async function POST(req: NextRequest) {
   try {
@@ -7,14 +6,35 @@ export async function POST(req: NextRequest) {
     const { name, email, subject, message } = body
 
     if (!name || !email || !subject || !message) {
-      return NextResponse.json({ error: 'Tous les champs sont requis.' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tous les champs sont requis.' },
+        { status: 400 }
+      )
     }
 
-    await sendContactEmail({ name, email, subject, message })
+    // Validation email basique
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { error: 'Adresse email invalide.' },
+        { status: 400 }
+      )
+    }
 
-    return NextResponse.json({ success: true }, { status: 200 })
-  } catch (error) {
-    console.error('[contact] Error:', error)
-    return NextResponse.json({ error: 'Erreur lors de l\'envoi du message.' }, { status: 500 })
+    // Log des données (l'envoi réel sera configuré avec Resend)
+    console.log('[Contact Form] Nouveau message reçu :', {
+      name,
+      email,
+      subject,
+      message,
+      receivedAt: new Date().toISOString(),
+    })
+
+    return NextResponse.json({ success: true })
+  } catch {
+    return NextResponse.json(
+      { error: 'Erreur interne du serveur.' },
+      { status: 500 }
+    )
   }
 }
