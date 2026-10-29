@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Clock, ChevronDown, ChevronUp, RotateCcw, Loader2 } from 'lucide-react'
+import { Clock, ChevronDown, ChevronUp, RotateCcw } from 'lucide-react'
 import type { GeneratedKit } from '@/types'
 
 interface Generation {
@@ -29,6 +29,16 @@ const DOMAIN_EMOJIS: Record<string, string> = {
 function formatDate(iso: string) {
   const d = new Date(iso)
   return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+}
+
+function SkeletonCards() {
+  return (
+    <div className="space-y-2">
+      {[0, 1, 2].map(i => (
+        <div key={i} className="animate-pulse bg-gray-100 rounded-xl h-16" />
+      ))}
+    </div>
+  )
 }
 
 export function HistoryPanel({ onReload, refreshTrigger }: HistoryPanelProps) {
@@ -74,9 +84,7 @@ export function HistoryPanel({ onReload, refreshTrigger }: HistoryPanelProps) {
       {open && (
         <div className="border-t border-gray-100 px-5 py-4">
           {loading ? (
-            <div className="flex items-center justify-center py-6">
-              <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
-            </div>
+            <SkeletonCards />
           ) : generations.length === 0 ? (
             <p className="text-sm text-gray-400 text-center py-6">Aucune génération enregistrée.</p>
           ) : (
