@@ -8,6 +8,7 @@ import { Loader2, Sparkles } from 'lucide-react'
 interface PropertyFormProps {
   onResult: (kit: GeneratedKit) => void
   creditsLeft?: number | null
+  canGenerate?: boolean
 }
 
 const defaultValues: PropertyInput = {
@@ -22,7 +23,7 @@ const defaultValues: PropertyInput = {
   annee_construction: '',
 }
 
-export function PropertyForm({ onResult, creditsLeft }: PropertyFormProps) {
+export function PropertyForm({ onResult, creditsLeft, canGenerate = true }: PropertyFormProps) {
   const [form, setForm] = useState<PropertyInput>(defaultValues)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -53,6 +54,11 @@ export function PropertyForm({ onResult, creditsLeft }: PropertyFormProps) {
       chambres: form.chambres ? sanitizeInput(form.chambres) : undefined,
       etage: form.etage ? sanitizeInput(form.etage) : undefined,
       annee_construction: form.annee_construction ? sanitizeInput(form.annee_construction) : undefined,
+    }
+
+    if (!canGenerate) {
+      setError('Quota épuisé. Passez au plan Pro pour continuer.')
+      return
     }
 
     setLoading(true)
@@ -211,7 +217,7 @@ export function PropertyForm({ onResult, creditsLeft }: PropertyFormProps) {
 
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || !canGenerate}
         className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200"
       >
         {loading ? (
