@@ -125,7 +125,7 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Mot de passe</label>
+            <div className="flex items-center justify-between mb-1.5"><label className="block text-sm font-medium text-gray-700">Mot de passe</label>{mode === 'login' && <Link href="/forgot-password" className="text-xs text-blue-600 hover:text-blue-700">Mot de passe oublié ?</Link>}</div>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
