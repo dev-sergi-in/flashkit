@@ -30,7 +30,7 @@ export default function PricingPage() {
           ))}
         </div>
         <p className="text-center text-sm text-gray-400 mt-8">
-          Paiement sécurisé par Stripe • Annulation à tout moment • Sans engagement
+          Paiement sécurisé par FedaPay • Mobile Money & Carte • Sans engagement
         </p>
       </div>
     </div>
