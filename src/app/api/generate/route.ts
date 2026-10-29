@@ -4,20 +4,33 @@ import { SYSTEM_PROMPT, buildUserMessage } from '@/lib/prompt'
 import type { GeneratedKit, ApiError } from '@/types'
 import { randomUUID } from 'crypto'
 
-const PropertySchema = z.object({
-  bien: z.string().min(3).max(200),
-  surface: z.string().min(1).max(50),
-  localisation: z.string().min(3).max(200),
-  prix: z.string().min(1).max(100),
-  points_forts: z.string().min(5).max(500),
-  ton: z.enum(['Standard', 'Prestige', 'Accessible']),
-  chambres: z.string().optional(),
-  etage: z.string().optional(),
-  annee_construction: z.string().optional(),
-})
+const DOMAIN_LABELS: Record<string, string> = {
+  immobilier: "Immobilier & Terrains",
+  ecommerce: "E-commerce & High-Tech",
+  automobile: "Automobile & Motos",
+  services: "Services & Prestations",
+  digital: "Formations En Ligne & SaaS",
+  restauration_evenements: "Restauration, Hôtels & Événements",
+  beaute_bienetre: "Beauté, Cosmétique & Spas",
+  materiel_pro: "Matériel Pro, BTP & Équipements",
+  education_ecoles: "Écoles & Formations Présentielles",
+  mode_artisanat: "Mode, Sur-Mesure & Artisanat",
+  sante_parapharmacie: "Santé, Parapharmacie & Bio",
+  agriculture_agro: "Agriculture, Élevage & Agroalimentaire",
+  voyage_logistique: "Voyage, Transport & Transit",
+  finance_juridique: "Finance, Assurance & Juridique",
+  sport_fitness: "Sport, Fitness & Coaching",
+  energie_solaire: "Énergie Solaire & Électricité",
+  art_divertissement: "Art, Musique & Entertainment",
+  autre_custom: "Autre Activité (Personnalisé)",
+}
 
 const RequestSchema = z.object({
-  property: PropertySchema,
+  input: z.object({
+    domain: z.string().min(1),
+    fields: z.record(z.string(), z.string()),
+    ton: z.enum(['Standard', 'Prestige', 'Accessible']),
+  }),
   userId: z.string().optional(),
 })
 
@@ -33,8 +46,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { property } = parsed.data
-    const userMessage = buildUserMessage(property)
+    const { input } = parsed.data
+    const { domain, fields, ton } = input
+    const domainLabel = DOMAIN_LABELS[domain] ?? domain
+    const userMessage = buildUserMessage(domain, domainLabel, fields, ton)
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
