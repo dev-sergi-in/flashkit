@@ -6,6 +6,7 @@ import { Sparkles, ArrowLeft, LogOut, User, Crown } from 'lucide-react'
 import { PropertyForm } from '@/components/PropertyForm'
 import { ResultsTabs } from '@/components/ResultsTabs'
 import { ExportButton } from '@/components/ExportButton'
+import { HistoryPanel } from '@/components/HistoryPanel'
 import { createSupabaseBrowser } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import type { GeneratedKit } from '@/types'
@@ -20,6 +21,7 @@ interface QuotaInfo {
 export default function DashboardPage() {
   const [kit, setKit] = useState<GeneratedKit | null>(null)
   const [quota, setQuota] = useState<QuotaInfo>({ plan: 'starter', remaining: null, canGenerate: true })
+  const [historyRefresh, setHistoryRefresh] = useState(0)
   const router = useRouter()
 
   const fetchQuota = useCallback(async () => {
@@ -48,7 +50,7 @@ export default function DashboardPage() {
     router.refresh()
   }
 
-  const handleGenerated = async (k: GeneratedKit) => {
+  const handleGenerated = async (k: GeneratedKit, domain?: string, domainLabel?: string) => {
     setKit(k)
     setQuota(q => ({
       ...q,
@@ -56,6 +58,14 @@ export default function DashboardPage() {
       canGenerate: q.remaining !== null ? q.remaining - 1 > 0 : true,
     }))
     await fetch('/api/quota', { method: 'POST' })
+    if (domain) {
+      await fetch('/api/history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain, domain_label: domainLabel ?? domain, kit: k }),
+      })
+      setHistoryRefresh(n => n + 1)
+    }
   }
 
   return (
@@ -110,7 +120,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
             <PropertyForm
-              onResult={handleGenerated}
+              onResult={(k, domain, domainLabel) => handleGenerated(k, domain, domainLabel)}
               creditsLeft={quota.remaining}
               canGenerate={quota.canGenerate}
             />
@@ -135,6 +145,10 @@ export default function DashboardPage() {
               </div>
             )}
           </div>
+        </div>
+
+        <div className="mt-6">
+          <HistoryPanel onReload={setKit} refreshTrigger={historyRefresh} />
         </div>
       </div>
     </div>
