@@ -1,17 +1,62 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { Sparkles, ArrowLeft } from 'lucide-react'
+import { Sparkles, ArrowLeft, LogOut, User, Crown } from 'lucide-react'
 import { PropertyForm } from '@/components/PropertyForm'
 import { ResultsTabs } from '@/components/ResultsTabs'
 import { ExportButton } from '@/components/ExportButton'
-import { useQuota } from '@/hooks/useQuota'
+import { createSupabaseBrowser } from '@/lib/supabase'
+import { useRouter } from 'next/navigation'
 import type { GeneratedKit } from '@/types'
+
+interface QuotaInfo {
+  plan: string
+  remaining: number | null
+  canGenerate: boolean
+  email?: string
+}
 
 export default function DashboardPage() {
   const [kit, setKit] = useState<GeneratedKit | null>(null)
-  const { remaining, canGenerate, consume } = useQuota()
+  const [quota, setQuota] = useState<QuotaInfo>({ plan: 'starter', remaining: null, canGenerate: true })
+  const router = useRouter()
+
+  const fetchQuota = useCallback(async () => {
+    try {
+      const res = await fetch('/api/quota')
+      if (res.ok) {
+        const data = await res.json()
+        setQuota({
+          plan: data.plan,
+          remaining: data.remaining,
+          canGenerate: data.canGenerate,
+          email: data.email,
+        })
+      }
+    } catch {
+      // fallback — keep defaults
+    }
+  }, [])
+
+  useEffect(() => { fetchQuota() }, [fetchQuota])
+
+  const handleLogout = async () => {
+    const supabase = createSupabaseBrowser()
+    await supabase.auth.signOut()
+    router.push('/login')
+    router.refresh()
+  }
+
+  const handleGenerated = async (k: GeneratedKit) => {
+    setKit(k)
+    setQuota(q => ({
+      ...q,
+      remaining: q.remaining !== null ? Math.max(0, q.remaining - 1) : null,
+      canGenerate: q.remaining !== null ? q.remaining - 1 > 0 : true,
+    }))
+    await fetch('/api/quota', { method: 'POST' })
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -28,9 +73,29 @@ export default function DashboardPage() {
               <span className="font-bold text-gray-900">Prompt-Kit AI</span>
             </div>
           </div>
-          <Link href="/pricing" className="text-sm text-blue-600 font-semibold hover:text-blue-700">
-            Passer Pro →
-          </Link>
+          <div className="flex items-center gap-3">
+            {quota.email && (
+              <div className="hidden sm:flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-2.5 py-1.5 rounded-lg">
+                <User className="w-3.5 h-3.5" />
+                {quota.email}
+              </div>
+            )}
+            {quota.plan === 'starter' ? (
+              <Link href="/pricing" className="flex items-center gap-1.5 text-xs text-blue-600 font-semibold hover:text-blue-700 bg-blue-50 px-2.5 py-1.5 rounded-lg">
+                <Crown className="w-3.5 h-3.5" />
+                Passer Pro
+              </Link>
+            ) : (
+              <span className="text-xs text-blue-600 font-semibold bg-blue-50 px-2.5 py-1.5 rounded-lg capitalize">{quota.plan}</span>
+            )}
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 transition-colors"
+              title="Déconnexion"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -44,7 +109,11 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
-            <PropertyForm onResult={(k) => { setKit(k); consume() }} creditsLeft={remaining} canGenerate={canGenerate} />
+            <PropertyForm
+              onResult={handleGenerated}
+              creditsLeft={quota.remaining}
+              canGenerate={quota.canGenerate}
+            />
           </div>
 
           <div>
