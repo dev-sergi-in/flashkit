@@ -2,12 +2,12 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Immo-Prompt AI — Génération de contenu immobilier en 5 secondes',
-  description: 'Convertissez vos fiches techniques en kits marketing complets : annonce web, Instagram, email et fiche vitrine. Propulsé par IA.',
-  keywords: ['immobilier', 'marketing', 'intelligence artificielle', 'annonce', 'agence immobilière'],
+  title: 'Prompt-Kit AI — Kit marketing professionnel en 5 secondes',
+  description: 'Transformez vos informations produit en kits marketing complets : annonce web, Instagram, email et fiche vitrine. 18 secteurs supportés. Propulsé par IA.',
+  keywords: ['marketing', 'intelligence artificielle', 'annonce', 'immobilier', 'e-commerce', 'contenu marketing'],
   openGraph: {
-    title: 'Immo-Prompt AI',
-    description: 'Générez votre kit marketing immobilier complet en moins de 5 secondes.',
+    title: 'Prompt-Kit AI',
+    description: 'Générez votre kit marketing professionnel en moins de 5 secondes.',
     type: 'website',
   },
 }
@@ -17,6 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="fr" suppressHydrationWarning>
       <body className="font-sans antialiased">
         {children}
+        <script src="https://cdn.fedapay.com/checkout.js" async />
       </body>
     </html>
   )
