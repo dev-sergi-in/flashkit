@@ -1,18 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createFedaPayCheckout } from '@/lib/stripe'
+import { createCinetPayCheckout } from '@/lib/stripe'
+import { createSupabaseServer } from '@/lib/supabase-server'
 
 const Schema = z.object({
   planId: z.enum(['pro', 'agence']),
-  email: z.string().email().optional(),
 })
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { planId, email } = Schema.parse(body)
+    const { planId } = Schema.parse(body)
 
-    const url = await createFedaPayCheckout(planId, email)
+    const supabase = createSupabaseServer()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    const url = await createCinetPayCheckout(planId, user?.email)
     return NextResponse.json({ url })
   } catch (error) {
     console.error('[checkout]', error)
