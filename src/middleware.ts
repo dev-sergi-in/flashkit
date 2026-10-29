@@ -8,7 +8,6 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   let response = NextResponse.next({ request: { headers: request.headers } })
 
-  // Auth middleware: protect /dashboard and redirect authenticated users from /login
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
@@ -39,7 +38,6 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Rate limiting for API routes
   const isRateLimited = RATE_LIMITED_ROUTES.some(route => pathname.startsWith(route))
   if (!isRateLimited) return response
 
@@ -49,24 +47,15 @@ export async function middleware(request: NextRequest) {
     if (!success) {
       return NextResponse.json(
         { error: 'Trop de requêtes. Veuillez patienter.', code: 'RATE_LIMITED' },
-        {
-          status: 429,
-          headers: {
-            'X-RateLimit-Remaining': '0',
-            'X-RateLimit-Reset': reset.toString(),
-            'Retry-After': Math.ceil((reset - Date.now()) / 1000).toString(),
-          },
-        }
+        { status: 429, headers: { 'X-RateLimit-Remaining': '0', 'X-RateLimit-Reset': reset.toString(), 'Retry-After': Math.ceil((reset - Date.now()) / 1000).toString() } }
       )
     }
     response.headers.set('X-RateLimit-Remaining', remaining.toString())
-  } catch {
-    // rate limit unavailable, allow through
-  }
+  } catch {}
 
   return response
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/login', '/api/generate', '/api/export', '/api/stripe/checkout'],
+  matcher: ['/dashboard/:path*', '/login', '/api/generate', '/api/export', '/api/stripe/checkout', '/api/upgrade', '/api/account/delete'],
 }
