@@ -1,26 +1,43 @@
-import Link from 'next/link'
-import { Sparkles, ArrowRight } from 'lucide-react'
+import type { Metadata } from "next"
+import Link from "next/link"
+import { Sparkles, ArrowRight } from "lucide-react"
 
 const SECTORS = [
-  { emoji: '🏠', label: 'Immobilier' },
-  { emoji: '🛒', label: 'E-commerce' },
-  { emoji: '🚗', label: 'Automobile' },
-  { emoji: '🔧', label: 'Services' },
-  { emoji: '💻', label: 'Digital' },
-  { emoji: '🍽️', label: 'Restauration' },
-  { emoji: '💅', label: 'Beauté' },
-  { emoji: '🏗️', label: 'BTP' },
-  { emoji: '🎓', label: 'Formation' },
-  { emoji: '👗', label: 'Mode' },
-  { emoji: '💊', label: 'Santé' },
-  { emoji: '🌾', label: 'Agriculture' },
-  { emoji: '✈️', label: 'Voyage' },
-  { emoji: '💰', label: 'Finance' },
-  { emoji: '🏋️', label: 'Sport' },
-  { emoji: '☀️', label: 'Énergie' },
-  { emoji: '🎨', label: 'Art' },
-  { emoji: '⚡', label: 'Autre' },
+  { emoji: "🏠", label: "Immobilier" },
+  { emoji: "🛒", label: "E-commerce" },
+  { emoji: "🚗", label: "Automobile" },
+  { emoji: "🔧", label: "Services" },
+  { emoji: "💻", label: "Digital" },
+  { emoji: "🍽️", label: "Restauration" },
+  { emoji: "💅", label: "Beauté" },
+  { emoji: "🏗️", label: "BTP" },
+  { emoji: "🎓", label: "Formation" },
+  { emoji: "👗", label: "Mode" },
+  { emoji: "💊", label: "Santé" },
+  { emoji: "🌾", label: "Agriculture" },
+  { emoji: "✈️", label: "Voyage" },
+  { emoji: "💰", label: "Finance" },
+  { emoji: "🏋️", label: "Sport" },
+  { emoji: "☀️", label: "Énergie" },
+  { emoji: "🎨", label: "Art" },
+  { emoji: "⚡", label: "Autre" },
 ]
+
+export const metadata: Metadata = {
+  title: "FlashKit — Kit marketing professionnel en 5 secondes",
+  description:
+    "Transformez vos informations produit en kits marketing complets : annonce web, Instagram, email et fiche vitrine. 18 secteurs supportés. Propulsé par IA.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "FlashKit — Kit marketing professionnel en 5 secondes",
+    description:
+      "Transformez vos informations produit en kits marketing complets : annonce web, Instagram, email et fiche vitrine. 18 secteurs supportés.",
+    url: "/",
+    type: "website",
+  },
+}
 
 export default function HomePage() {
   return (
@@ -36,9 +53,6 @@ export default function HomePage() {
           <div className="flex items-center gap-4">
             <Link href="/pricing" className="text-sm text-gray-600 hover:text-gray-900 font-medium">
               Tarifs
-            </Link>
-            <Link href="/contact" className="text-sm text-gray-600 hover:text-gray-900 font-medium">
-              Contact
             </Link>
             <Link
               href="/login"
@@ -80,10 +94,10 @@ export default function HomePage() {
       <section className="max-w-4xl mx-auto px-4 pb-16">
         <div className="grid grid-cols-3 gap-6 text-center">
           {[
-            { value: '90%', label: 'De temps gagné' },
-            { value: '< 5s', label: 'Par génération' },
-            { value: '18', label: 'Secteurs supportés' },
-          ].map(stat => (
+            { value: "90%", label: "De temps gagné" },
+            { value: "< 5s", label: "Par génération" },
+            { value: "18", label: "Secteurs supportés" },
+          ].map((stat) => (
             <div key={stat.value} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <p className="text-3xl font-bold text-blue-600 mb-1">{stat.value}</p>
               <p className="text-sm text-gray-500">{stat.label}</p>
@@ -122,21 +136,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      <footer className="border-t border-gray-100 py-8">
-        <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-400">
-          <span>© 2026 FlashKit — Tous droits réservés</span>
-          <div className="flex items-center gap-6">
-            <Link href="/pricing" className="hover:text-gray-700 transition-colors">
-              Tarifs
-            </Link>
-            <Link href="/contact" className="hover:text-gray-700 transition-colors">
-              Contact
-            </Link>
-            <Link href="/login" className="hover:text-gray-700 transition-colors">
-              Se connecter
-            </Link>
-          </div>
-        </div>
+      <footer className="border-t border-gray-100 py-8 text-center text-sm text-gray-400">
+        © 2026 FlashKit — Tous droits réservés
       </footer>
     </div>
   )
