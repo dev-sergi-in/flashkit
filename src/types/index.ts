@@ -1,70 +1,69 @@
-export type Ton = 'Professionnel' | 'Persuasif' | 'Luxe' | 'Court'
+export type Ton = 'Professionnel' | 'Persuasif' | 'Energique' | 'Luxe'
 
-export interface KitWhatsApp {
-  texte: string
+export type SectorId =
+  | 'immobilier' | 'ecommerce' | 'automobile' | 'services' | 'digital'
+  | 'restauration' | 'beaute' | 'btp' | 'formation' | 'mode'
+  | 'sante' | 'agriculture' | 'voyage' | 'finance' | 'sport'
+  | 'energie' | 'art' | 'autre'
+
+export interface GeneratorInput {
+  sector: SectorId
+  intitule: string
+  arguments_cles: string
+  prix: string
+  cible: string
+  ton: Ton
 }
 
-export interface KitSocial {
-  caption: string
+export interface KitTikTok {
+  hook: string
+  scenes: string
+  script: string
+  cta: string
+}
+
+export interface KitFacebook {
+  post: string
   hashtags: string[]
 }
 
-export interface KitPortail {
+export interface KitWeb {
   titre: string
-  description: string
-  mots_cles: string[]
+  resume: string
+  points: string[]
+}
+
+export interface KitEmail {
+  objet: string
+  corps: string
+}
+
+export interface KitFiche {
+  synthese: string
+  offre: string
 }
 
 export interface GeneratedKit {
-  whatsapp: KitWhatsApp
-  social: KitSocial
-  portail: KitPortail
+  tiktok: KitTikTok
+  facebook: KitFacebook
+  web: KitWeb
+  email: KitEmail
+  fiche: KitFiche
 }
 
-export type PlanId = 'starter' | 'pro' | 'agence' | 'enterprise'
-
-export interface Plan {
-  id: PlanId
+export interface CreditPack {
+  id: 'starter' | 'pro' | 'agence'
   nom: string
-  prix_eur: number | null
-  prix_fcfa: number | null
-  generations: number | null
-  features: string[]
-  cta: string
+  prix_fcfa: number
+  credits_base: number
+  credits_bonus: number
+  credits_total: number
   populaire?: boolean
-}
-
-export interface ImmoInput {
-  type_bien: string
-  operation: string
-  superficie: string
-  prix: string
-  ville: string
-  pieces?: string
-  chambres?: string
-  salles_bain?: string
-  atouts: string[]
-  ton: Ton
-  details?: string
-}
-
-export interface GenerateRequest {
-  input: ImmoInput
-}
-
-export interface GenerateResponse {
-  kit: GeneratedKit
-  generation_id: string
+  cta: string
+  features: string[]
 }
 
 export interface ApiError {
   error: string
-  code?: string
-}
-
-export interface QuotaStatus {
-  used: number
-  limit: number | null
-  plan: PlanId
-  reset_at?: Date
+  code: string
 }
