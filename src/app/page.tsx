@@ -1,20 +1,64 @@
 import Link from 'next/link'
-import { Sparkles, ArrowRight, Home, MessageCircle, Share2, Globe } from 'lucide-react'
+import { Sparkles, ArrowRight } from 'lucide-react'
+
+const FORMATS = [
+  {
+    icon: '🎬',
+    title: 'Script TikTok & Reels',
+    desc: 'Hook accrocheur, indications de scènes et CTA percutant pour vos vidéos courtes',
+  },
+  {
+    icon: '📱',
+    title: 'Post Facebook & Instagram',
+    desc: 'Storytelling engageant avec émojis, paragraphes aérés et hashtags ciblés',
+  },
+  {
+    icon: '🌐',
+    title: 'Annonce Web & Marketplace',
+    desc: 'Titre SEO, résumé accrocheur et liste de caractéristiques techniques',
+  },
+  {
+    icon: '📧',
+    title: 'Email de Prospection',
+    desc: 'Objet percutant et corps structuré AIDA prêt à envoyer',
+  },
+  {
+    icon: '📋',
+    title: 'Fiche Commerciale',
+    desc: 'Synthèse bénéfices clients et présentation de l\'offre tarifaire',
+  },
+]
+
+const SECTORS = [
+  'Immobilier', 'E-commerce', 'Automobile', 'Services', 'Digital/SaaS',
+  'Restauration', 'Beauté', 'BTP', 'Formation', 'Mode', 'Santé',
+  'Agriculture', 'Voyage', 'Finance', 'Sport', 'Énergie', 'Art', 'Autre',
+]
+
+const PRICING_TEASER = [
+  { name: 'Pack Starter', price: '1 000 FCFA', credits: '15 crédits', popular: false },
+  { name: 'Pack Pro', price: '3 000 FCFA', credits: '55 crédits', popular: true },
+  { name: 'Pack Agence', price: '10 000 FCFA', credits: '230 crédits', popular: false },
+]
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      {/* Navbar */}
       <nav className="border-b border-gray-100 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
-            <span className="font-bold text-gray-900 text-lg">Flashkit AI</span>
+            <span className="font-bold text-gray-900 text-lg">FlashKit AI</span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <Link href="/pricing" className="text-sm text-gray-600 hover:text-gray-900 font-medium">
               Tarifs
+            </Link>
+            <Link href="/login" className="text-sm text-gray-600 hover:text-gray-900 font-medium border border-gray-200 px-4 py-2 rounded-lg transition-colors hover:bg-gray-50">
+              Se connecter
             </Link>
             <Link href="/login" className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
               Essayer gratuitement
@@ -23,39 +67,39 @@ export default function HomePage() {
         </div>
       </nav>
 
+      {/* Hero */}
       <section className="max-w-6xl mx-auto px-4 pt-20 pb-16 text-center">
         <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 text-xs font-semibold px-4 py-2 rounded-full mb-6">
-          <Home className="w-3.5 h-3.5" />
-          Spécialiste immobilier • IA générative
+          ✨ 3 crédits offerts à l&apos;inscription
         </div>
         <h1 className="text-5xl font-bold text-gray-900 mb-6 leading-tight">
-          Votre annonce immobilière<br />
-          <span className="text-blue-600">prête en 5 secondes</span>
+          Générez 5 formats marketing<br />
+          <span className="text-blue-600">en 1 clic</span>
         </h1>
         <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-          Renseignez les caractéristiques du bien et obtenez instantanément une annonce
-          optimisée pour WhatsApp, Facebook/Instagram et les portails immobiliers.
+          Scripts TikTok, posts Facebook, annonces web, emails de prospection et fiches commerciales.
+          Propulsé par l&apos;IA Claude d&apos;Anthropic.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link href="/login" className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-xl text-lg transition-colors shadow-lg shadow-blue-200">
-            Générer gratuitement <ArrowRight className="w-5 h-5" />
+            Commencer gratuitement — 3 crédits offerts <ArrowRight className="w-5 h-5" />
           </Link>
           <Link href="/pricing" className="text-gray-600 hover:text-gray-900 font-medium px-6 py-4">
             Voir les tarifs →
           </Link>
         </div>
-        <p className="text-sm text-gray-400 mt-4">10 générations gratuites • Sans carte bancaire</p>
+        <p className="text-sm text-gray-400 mt-4">
+          Aucune carte bancaire requise • 18 secteurs couverts • 5 formats par génération
+        </p>
       </section>
 
-      <section className="max-w-5xl mx-auto px-4 pb-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[
-            { icon: <MessageCircle className="w-6 h-6 text-green-600" />, bg: 'bg-green-50', title: 'Format WhatsApp', desc: 'Court, accrocheur, avec émojis et puces. Prêt à coller directement.' },
-            { icon: <Share2 className="w-6 h-6 text-purple-600" />, bg: 'bg-purple-50', title: 'Réseaux Sociaux', desc: 'Storytelling persuasif pour Facebook et Instagram avec hashtags.' },
-            { icon: <Globe className="w-6 h-6 text-blue-600" />, bg: 'bg-blue-50', title: 'Portail Web', desc: 'Description détaillée et technique pour les sites immobiliers.' },
-          ].map(f => (
+      {/* 5 Formats */}
+      <section className="max-w-6xl mx-auto px-4 pb-16">
+        <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">5 formats générés en une seule fois</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {FORMATS.map(f => (
             <div key={f.title} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <div className={`w-12 h-12 ${f.bg} rounded-xl flex items-center justify-center mb-4`}>{f.icon}</div>
+              <div className="text-3xl mb-4">{f.icon}</div>
               <h3 className="font-bold text-gray-900 mb-2">{f.title}</h3>
               <p className="text-sm text-gray-500">{f.desc}</p>
             </div>
@@ -63,33 +107,54 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="max-w-4xl mx-auto px-4 pb-16">
-        <div className="grid grid-cols-3 gap-6 text-center">
-          {[
-            { value: '90%', label: 'De temps gagné' },
-            { value: '< 5s', label: 'Par génération' },
-            { value: '3', label: 'Formats inclus' },
-          ].map(stat => (
-            <div key={stat.value} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <p className="text-3xl font-bold text-blue-600 mb-1">{stat.value}</p>
-              <p className="text-sm text-gray-500">{stat.label}</p>
-            </div>
+      {/* 18 Sectors */}
+      <section className="max-w-5xl mx-auto px-4 pb-16 text-center">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">18 secteurs d&apos;activité couverts</h2>
+        <p className="text-gray-500 mb-8">FlashKit AI s&apos;adapte à votre domaine pour un contenu pertinent et ciblé.</p>
+        <div className="flex flex-wrap justify-center gap-2">
+          {SECTORS.map(sector => (
+            <span key={sector} className="bg-white border border-gray-200 text-gray-700 text-sm font-medium px-4 py-2 rounded-full shadow-sm">
+              {sector}
+            </span>
           ))}
         </div>
       </section>
 
-      <section className="max-w-4xl mx-auto px-4 pb-20 text-center">
-        <div className="bg-blue-600 rounded-3xl p-12 text-white">
-          <h2 className="text-3xl font-bold mb-4">Prêt à vendre plus vite ?</h2>
-          <p className="text-blue-100 mb-8">Rejoignez les agents immobiliers qui publient en quelques secondes.</p>
-          <Link href="/login" className="inline-flex items-center gap-2 bg-white text-blue-600 font-bold px-8 py-4 rounded-xl hover:bg-blue-50 transition-colors">
-            Commencer gratuitement <ArrowRight className="w-5 h-5" />
-          </Link>
+      {/* Pricing teaser */}
+      <section className="max-w-5xl mx-auto px-4 pb-16">
+        <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">Tarifs simples et transparents</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {PRICING_TEASER.map(p => (
+            <div
+              key={p.name}
+              className={`bg-white rounded-2xl p-6 border text-center ${
+                p.popular
+                  ? 'border-blue-400 shadow-md ring-2 ring-blue-100'
+                  : 'border-gray-100 shadow-sm'
+              }`}
+            >
+              {p.popular && (
+                <span className="inline-block bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full mb-3">
+                  ⭐ Populaire
+                </span>
+              )}
+              <p className="font-bold text-gray-900 text-lg mb-1">{p.name}</p>
+              <p className="text-2xl font-bold text-blue-600 mb-1">{p.price}</p>
+              <p className="text-sm text-gray-500">{p.credits}</p>
+            </div>
+          ))}
         </div>
+        <p className="text-center mt-6">
+          <Link href="/pricing" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+            Voir les détails →
+          </Link>
+        </p>
       </section>
 
-      <footer className="border-t border-gray-100 py-8 text-center text-sm text-gray-400">
-        © 2026 Flashkit AI — Tous droits réservés
+      {/* Footer */}
+      <footer className="border-t border-gray-100 py-8 text-center text-sm text-gray-400 space-y-1">
+        <p>© 2026 FlashKit AI — Tous droits réservés</p>
+        <p>Mobile Money &amp; Cartes acceptés via CinetPay</p>
       </footer>
     </div>
   )
