@@ -6,27 +6,6 @@ import { createSupabaseServer } from '@/lib/supabase-server'
 import type { GeneratedKit, ApiError } from '@/types'
 import { randomUUID } from 'crypto'
 
-const DOMAIN_LABELS: Record<string, string> = {
-  immobilier: "Immobilier & Terrains",
-  ecommerce: "E-commerce & High-Tech",
-  automobile: "Automobile & Motos",
-  services: "Services & Prestations",
-  digital: "Formations En Ligne & SaaS",
-  restauration_evenements: "Restauration, Hôtels & Événements",
-  beaute_bienetre: "Beauté, Cosmétique & Spas",
-  materiel_pro: "Matériel Pro, BTP & Équipements",
-  education_ecoles: "Écoles & Formations Présentielles",
-  mode_artisanat: "Mode, Sur-Mesure & Artisanat",
-  sante_parapharmacie: "Santé, Parapharmacie & Bio",
-  agriculture_agro: "Agriculture, Élevage & Agroalimentaire",
-  voyage_logistique: "Voyage, Transport & Transit",
-  finance_juridique: "Finance, Assurance & Juridique",
-  sport_fitness: "Sport, Fitness & Coaching",
-  energie_solaire: "Énergie Solaire & Électricité",
-  art_divertissement: "Art, Musique & Entertainment",
-  autre_custom: "Autre Activité (Personnalisé)",
-}
-
 const PLAN_LIMITS: Record<string, number | null> = {
   starter: 10,
   pro: null,
@@ -41,11 +20,18 @@ function nextMonthReset() {
 
 const RequestSchema = z.object({
   input: z.object({
-    domain: z.string().min(1),
-    fields: z.record(z.string(), z.string()),
-    ton: z.enum(['Standard', 'Prestige', 'Accessible']),
+    type_bien: z.string().min(1),
+    operation: z.string().min(1),
+    superficie: z.string().min(1),
+    prix: z.string().min(1),
+    ville: z.string().min(1),
+    pieces: z.string().optional(),
+    chambres: z.string().optional(),
+    salles_bain: z.string().optional(),
+    atouts: z.array(z.string()).optional(),
+    ton: z.enum(['Professionnel', 'Persuasif', 'Luxe', 'Court']),
+    details: z.string().optional(),
   }),
-  userId: z.string().optional(),
 })
 
 export async function POST(request: NextRequest) {
@@ -86,9 +72,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { input } = parsed.data
-    const { domain, fields, ton } = input
-    const domainLabel = DOMAIN_LABELS[domain] ?? domain
-    const userMessage = buildUserMessage(domain, domainLabel, fields, ton)
+    const userMessage = buildUserMessage(input)
 
     // Appel Claude avec prompt caching
     const message = await anthropic.messages.create({
@@ -145,8 +129,8 @@ export async function POST(request: NextRequest) {
         await supabase.from('generations').insert({
           id: generation_id,
           user_id: user.id,
-          domain,
-          ton,
+          domain: input.type_bien,
+          ton: input.ton,
           kit,
           created_at: new Date().toISOString(),
         })
