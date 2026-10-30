@@ -6,31 +6,18 @@ import { createSupabaseServer } from '@/lib/supabase-server'
 import type { GeneratedKit, ApiError } from '@/types'
 import { randomUUID } from 'crypto'
 
-const PLAN_LIMITS: Record<string, number | null> = {
-  starter: 10,
-  pro: null,
-  agence: null,
-  enterprise: null,
-}
-
-function nextMonthReset() {
-  const now = new Date()
-  return new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString()
-}
-
 const RequestSchema = z.object({
   input: z.object({
-    type_bien: z.string().min(1),
-    operation: z.string().min(1),
-    superficie: z.string().min(1),
+    sector: z.enum([
+      'immobilier', 'ecommerce', 'automobile', 'services', 'digital',
+      'restauration', 'beaute', 'btp', 'formation', 'mode', 'sante',
+      'agriculture', 'voyage', 'finance', 'sport', 'energie', 'art', 'autre',
+    ]),
+    intitule: z.string().min(1),
+    arguments_cles: z.string().min(1),
     prix: z.string().min(1),
-    ville: z.string().min(1),
-    pieces: z.string().optional(),
-    chambres: z.string().optional(),
-    salles_bain: z.string().optional(),
-    atouts: z.array(z.string()).optional(),
-    ton: z.enum(['Professionnel', 'Persuasif', 'Luxe', 'Court']),
-    details: z.string().optional(),
+    cible: z.string().min(1),
+    ton: z.enum(['Professionnel', 'Persuasif', 'Energique', 'Luxe']),
   }),
 })
 
@@ -46,35 +33,40 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Vérifier quota en base
     const supabase = createSupabaseServer()
     const { data: { user } } = await supabase.auth.getUser()
 
-    if (user) {
-      const { data: quota } = await supabase
-        .from('quotas')
-        .select('count, plan, reset_at')
-        .eq('user_id', user.id)
-        .single()
+    if (!user) {
+      return NextResponse.json<ApiError>(
+        { error: 'Non authentifié', code: 'UNAUTHORIZED' },
+        { status: 401 }
+      )
+    }
 
-      const plan = quota?.plan ?? 'starter'
-      const limit = PLAN_LIMITS[plan] ?? 10
-      const now = new Date()
-      const shouldReset = quota?.reset_at && now > new Date(quota.reset_at)
-      const currentCount = shouldReset ? 0 : (quota?.count ?? 0)
+    // Credit check
+    const { data: quota } = await supabase
+      .from('quotas')
+      .select('credits')
+      .eq('user_id', user.id)
+      .single()
 
-      if (limit !== null && currentCount >= limit) {
-        return NextResponse.json<ApiError>(
-          { error: 'Quota mensuel atteint. Passez au plan Pro pour continuer.', code: 'QUOTA_EXCEEDED' },
-          { status: 429 }
-        )
-      }
+    if (!quota) {
+      // Welcome gift: insert row with 3 credits
+      await supabase.from('quotas').insert({
+        user_id: user.id,
+        credits: 3,
+      })
+    } else if (quota.credits <= 0) {
+      return NextResponse.json<ApiError>(
+        { error: 'Crédits épuisés. Rechargez votre compte pour continuer.', code: 'QUOTA_EXCEEDED' },
+        { status: 429 }
+      )
     }
 
     const { input } = parsed.data
     const userMessage = buildUserMessage(input)
 
-    // Appel Claude avec prompt caching
+    // Call Claude with prompt caching
     const message = await anthropic.messages.create({
       model: MODEL,
       max_tokens: MAX_TOKENS,
@@ -98,49 +90,25 @@ export async function POST(request: NextRequest) {
 
     const generation_id = randomUUID()
 
-    // Incrémenter quota en base
-    if (user) {
-      const { data: quota } = await supabase
-        .from('quotas')
-        .select('count, plan, reset_at')
-        .eq('user_id', user.id)
-        .single()
+    // Decrement credits
+    await supabase
+      .from('quotas')
+      .update({ credits: (quota?.credits ?? 3) - 1 })
+      .eq('user_id', user.id)
 
-      const now = new Date()
-      const shouldReset = quota?.reset_at && now > new Date(quota.reset_at)
-      const newCount = shouldReset ? 1 : (quota?.count ?? 0) + 1
+    // Save to generations table (non-blocking)
+    try {
+      await supabase.from('generations').insert({
+        id: generation_id,
+        user_id: user.id,
+        domain: input.sector,
+        ton: input.ton,
+        kit,
+        created_at: new Date().toISOString(),
+      })
+    } catch { /* ignoré */ }
 
-      if (!quota) {
-        await supabase.from('quotas').insert({
-          user_id: user.id,
-          count: 1,
-          reset_at: nextMonthReset(),
-          plan: 'starter',
-        })
-      } else {
-        await supabase.from('quotas').update({
-          count: newCount,
-          ...(shouldReset && { reset_at: nextMonthReset() }),
-        }).eq('user_id', user.id)
-      }
-
-      // Sauvegarder en historique (non bloquant)
-      try {
-        await supabase.from('generations').insert({
-          id: generation_id,
-          user_id: user.id,
-          domain: input.type_bien,
-          ton: input.ton,
-          kit,
-          created_at: new Date().toISOString(),
-        })
-      } catch { /* ignoré */ }
-    }
-
-    return NextResponse.json({
-      kit,
-      generation_id,
-    })
+    return NextResponse.json({ kit, generation_id })
   } catch (error) {
     console.error('[generate] error:', error)
     const message = error instanceof Error ? error.message : 'Erreur interne'
