@@ -1,27 +1,44 @@
 import type { GeneratedKit } from '@/types'
 
 export function kitToText(kit: GeneratedKit): string {
-  return `=== Flashkit AI — ANNONCES IMMOBILIÈRES ===
+  return `=== FlashKit AI — KIT MARKETING ===
 Généré le ${new Date().toLocaleDateString('fr-FR')}
 
---- WHATSAPP ---
-${kit.whatsapp.texte}
+--- SCRIPT TIKTOK & REELS ---
+Hook : ${kit.tiktok.hook}
+Scènes : ${kit.tiktok.scenes}
 
---- RÉSEAUX SOCIAUX ---
-${kit.social.caption}
+Script :
+${kit.tiktok.script}
 
-Hashtags : ${kit.social.hashtags.join(' ')}
+CTA : ${kit.tiktok.cta}
 
---- PORTAIL IMMOBILIER ---
-Titre : ${kit.portail.titre}
+--- POST FACEBOOK & INSTAGRAM ---
+${kit.facebook.post}
 
-${kit.portail.description}
+Hashtags : ${kit.facebook.hashtags.join(' ')}
 
-Mots-clés : ${kit.portail.mots_cles.join(', ')}
+--- ANNONCE WEB & MARKETPLACE ---
+Titre : ${kit.web.titre}
+
+${kit.web.resume}
+
+Points clés :
+${kit.web.points.map(p => `• ${p}`).join('\n')}
+
+--- EMAIL DE PROSPECTION ---
+Objet : ${kit.email.objet}
+
+${kit.email.corps}
+
+--- FICHE COMMERCIALE ---
+${kit.fiche.synthese}
+
+Offre : ${kit.fiche.offre}
 `
 }
 
-export function downloadText(kit: GeneratedKit, filename = 'annonces-immo.txt') {
+export function downloadText(kit: GeneratedKit, filename = 'kit-marketing.txt') {
   const text = kitToText(kit)
   const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
   const url = URL.createObjectURL(blob)
@@ -37,7 +54,7 @@ export function downloadPDF(kit: GeneratedKit) {
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Annonces Immobilières — Flashkit AI</title>
+<title>Kit Marketing — FlashKit AI</title>
 <style>
   body { font-family: Arial, sans-serif; margin: 0; padding: 0; color: #111827; }
   .header { background: #2563eb; color: white; padding: 20px 30px; }
@@ -53,24 +70,37 @@ export function downloadPDF(kit: GeneratedKit) {
 </head>
 <body>
 <div class="header">
-  <h1>Flashkit AI</h1>
-  <p>Annonces Immobilières — ${new Date().toLocaleDateString('fr-FR')}</p>
+  <h1>FlashKit AI</h1>
+  <p>Kit Marketing — ${new Date().toLocaleDateString('fr-FR')}</p>
 </div>
 <div class="content">
   <div class="section">
-    <div class="section-title">WhatsApp</div>
-    <p>${kit.whatsapp.texte.replace(/\n/g, '<br>')}</p>
+    <div class="section-title">Script TikTok & Reels</div>
+    <p><span class="label">Hook :</span> ${kit.tiktok.hook}</p>
+    <p><span class="label">Scènes :</span> ${kit.tiktok.scenes}</p>
+    <p><span class="label">Script :</span> ${kit.tiktok.script.replace(/\n/g, '<br>')}</p>
+    <p><span class="label">CTA :</span> ${kit.tiktok.cta}</p>
   </div>
   <div class="section">
-    <div class="section-title">Réseaux Sociaux</div>
-    <p>${kit.social.caption.replace(/\n/g, '<br>')}</p>
-    <p><span class="label">Hashtags :</span> ${kit.social.hashtags.join(' ')}</p>
+    <div class="section-title">Post Facebook & Instagram</div>
+    <p>${kit.facebook.post.replace(/\n/g, '<br>')}</p>
+    <p><span class="label">Hashtags :</span> ${kit.facebook.hashtags.join(' ')}</p>
   </div>
   <div class="section">
-    <div class="section-title">Portail Immobilier</div>
-    <p><span class="label">Titre :</span> ${kit.portail.titre}</p>
-    <p>${kit.portail.description.replace(/\n/g, '<br>')}</p>
-    <p><span class="label">Mots-clés :</span> ${kit.portail.mots_cles.join(', ')}</p>
+    <div class="section-title">Annonce Web & Marketplace</div>
+    <p><span class="label">Titre :</span> ${kit.web.titre}</p>
+    <p>${kit.web.resume.replace(/\n/g, '<br>')}</p>
+    ${kit.web.points.map(p => `<p>• ${p}</p>`).join('')}
+  </div>
+  <div class="section">
+    <div class="section-title">Email de Prospection</div>
+    <p><span class="label">Objet :</span> ${kit.email.objet}</p>
+    <p>${kit.email.corps.replace(/\n/g, '<br>')}</p>
+  </div>
+  <div class="section">
+    <div class="section-title">Fiche Commerciale</div>
+    <p>${kit.fiche.synthese.replace(/\n/g, '<br>')}</p>
+    <p><span class="label">Offre :</span> ${kit.fiche.offre}</p>
   </div>
 </div>
 </body>
