@@ -69,23 +69,28 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
-        <Link href="/" className="flex items-center gap-2 mb-8">
+    <div className="min-h-screen flex items-center justify-center p-4 animate-fade-in">
+      {/* Background decoration */}
+      <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-indigo-100 -z-10" />
+
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 animate-scale-in">
+        <Link href="/" className="flex items-center gap-2 mb-8 animate-fade-up delay-100">
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
             <Sparkles className="w-4 h-4 text-white" />
           </div>
           <span className="font-bold text-gray-900 text-lg">Prompt-Kit AI</span>
         </Link>
 
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">
-          {mode === 'login' ? 'Connexion' : 'Créer un compte'}
-        </h1>
-        <p className="text-gray-500 text-sm mb-6">
-          {mode === 'login'
-            ? 'Accédez à votre espace de génération'
-            : 'Commencez avec 10 générations gratuites'}
-        </p>
+        <div className="animate-fade-up delay-200">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">
+            {mode === 'login' ? 'Connexion' : 'Créer un compte'}
+          </h1>
+          <p className="text-gray-500 text-sm mb-6">
+            {mode === 'login'
+              ? 'Accédez à votre espace de génération'
+              : 'Commencez avec 10 générations gratuites'}
+          </p>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -98,7 +103,7 @@ export default function LoginPage() {
                 onChange={e => setEmail(e.target.value)}
                 required
                 placeholder="votre@email.com"
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 focus:shadow-md"
               />
             </div>
           </div>
@@ -114,7 +119,7 @@ export default function LoginPage() {
                 required
                 minLength={6}
                 placeholder="Min. 6 caractères"
-                className="w-full pl-10 pr-10 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                className="w-full pl-10 pr-10 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 focus:shadow-md"
               />
               <button
                 type="button"
@@ -127,12 +132,12 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <div className="text-red-600 text-sm bg-red-50 border border-red-100 px-3 py-2.5 rounded-xl">
+            <div className="text-red-600 text-sm bg-red-50 border border-red-100 px-3 py-2.5 rounded-xl animate-scale-in">
               {error}
             </div>
           )}
           {success && (
-            <div className="text-green-700 text-sm bg-green-50 border border-green-100 px-3 py-2.5 rounded-xl">
+            <div className="text-green-700 text-sm bg-green-50 border border-green-100 px-3 py-2.5 rounded-xl animate-scale-in">
               {success}
             </div>
           )}
@@ -140,14 +145,14 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-70 text-white font-semibold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+            className="btn-press w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-70 text-white font-semibold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
           >
             {loading && <Loader2 className="w-4 h-4 animate-spin" />}
             {mode === 'login' ? 'Se connecter' : 'Créer mon compte'}
           </button>
         </form>
 
-        <div className="flex items-center gap-3 my-5">
+        <div className="flex items-center gap-3 my-5 animate-fade-in delay-400">
           <div className="flex-1 h-px bg-gray-200" />
           <span className="text-xs text-gray-400">ou</span>
           <div className="flex-1 h-px bg-gray-200" />
@@ -156,7 +161,7 @@ export default function LoginPage() {
         <button
           onClick={handleGoogle}
           disabled={loadingGoogle}
-          className="w-full flex items-center justify-center gap-3 border border-gray-200 hover:bg-gray-50 disabled:opacity-70 text-gray-700 font-medium py-3 rounded-xl transition-colors"
+          className="btn-press animate-fade-up delay-500 w-full flex items-center justify-center gap-3 border border-gray-200 hover:bg-gray-50 disabled:opacity-70 text-gray-700 font-medium py-3 rounded-xl transition-colors"
         >
           {loadingGoogle ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -171,7 +176,7 @@ export default function LoginPage() {
           Continuer avec Google
         </button>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="text-center text-sm text-gray-500 mt-6 animate-fade-up delay-600">
           {mode === 'login' ? "Pas encore de compte ?" : "Déjà un compte ?"}{' '}
           <button
             onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(''); setSuccess('') }}
