@@ -1,38 +1,27 @@
 import type { GeneratedKit } from '@/types'
 
 export function kitToText(kit: GeneratedKit): string {
-  return `=== Prompt-Kit AI — KIT MARKETING ===
+  return `=== Flashkit AI — ANNONCES IMMOBILIÈRES ===
 Généré le ${new Date().toLocaleDateString('fr-FR')}
 
---- ANNONCE WEB SEO ---
-Titre : ${kit.annonce_web.titre_seo}
+--- WHATSAPP ---
+${kit.whatsapp.texte}
 
-Description :
-${kit.annonce_web.description_longue}
+--- RÉSEAUX SOCIAUX ---
+${kit.social.caption}
 
-Mots-clés : ${kit.annonce_web.mots_cles.join(', ')}
+Hashtags : ${kit.social.hashtags.join(' ')}
 
---- INSTAGRAM ---
-Caption :
-${kit.social_media.instagram_caption}
+--- PORTAIL IMMOBILIER ---
+Titre : ${kit.portail.titre}
 
-Hashtags : ${kit.social_media.hashtags.join(' ')}
+${kit.portail.description}
 
---- EMAIL DE PROSPECTION ---
-Objet : ${kit.outreach.email_objet}
-
-Corps :
-${kit.outreach.email_corps}
-
---- FICHE VITRINE ---
-Titre : ${kit.print.titre_vitrine}
-
-Points forts :
-${kit.print.points_forts.map(p => `• ${p}`).join('\n')}
+Mots-clés : ${kit.portail.mots_cles.join(', ')}
 `
 }
 
-export function downloadText(kit: GeneratedKit, filename = 'kit-marketing.txt') {
+export function downloadText(kit: GeneratedKit, filename = 'annonces-immo.txt') {
   const text = kitToText(kit)
   const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
   const url = URL.createObjectURL(blob)
@@ -48,7 +37,7 @@ export function downloadPDF(kit: GeneratedKit) {
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Kit Marketing — Prompt-Kit AI</title>
+<title>Annonces Immobilières — Flashkit AI</title>
 <style>
   body { font-family: Arial, sans-serif; margin: 0; padding: 0; color: #111827; }
   .header { background: #2563eb; color: white; padding: 20px 30px; }
@@ -64,30 +53,24 @@ export function downloadPDF(kit: GeneratedKit) {
 </head>
 <body>
 <div class="header">
-  <h1>Prompt-Kit AI</h1>
-  <p>Kit Marketing — ${new Date().toLocaleDateString('fr-FR')}</p>
+  <h1>Flashkit AI</h1>
+  <p>Annonces Immobilières — ${new Date().toLocaleDateString('fr-FR')}</p>
 </div>
 <div class="content">
   <div class="section">
-    <div class="section-title">Annonce Web SEO</div>
-    <p><span class="label">Titre :</span> ${kit.annonce_web.titre_seo}</p>
-    <p>${kit.annonce_web.description_longue.replace(/\n/g, '<br>')}</p>
-    <p><span class="label">Mots-clés :</span> ${kit.annonce_web.mots_cles.join(', ')}</p>
+    <div class="section-title">WhatsApp</div>
+    <p>${kit.whatsapp.texte.replace(/\n/g, '<br>')}</p>
   </div>
   <div class="section">
-    <div class="section-title">Instagram</div>
-    <p>${kit.social_media.instagram_caption.replace(/\n/g, '<br>')}</p>
-    <p><span class="label">Hashtags :</span> ${kit.social_media.hashtags.join(' ')}</p>
+    <div class="section-title">Réseaux Sociaux</div>
+    <p>${kit.social.caption.replace(/\n/g, '<br>')}</p>
+    <p><span class="label">Hashtags :</span> ${kit.social.hashtags.join(' ')}</p>
   </div>
   <div class="section">
-    <div class="section-title">Email de Prospection</div>
-    <p><span class="label">Objet :</span> ${kit.outreach.email_objet}</p>
-    <p>${kit.outreach.email_corps.replace(/\n/g, '<br>')}</p>
-  </div>
-  <div class="section">
-    <div class="section-title">Fiche Vitrine</div>
-    <p><span class="label">Titre :</span> ${kit.print.titre_vitrine}</p>
-    ${kit.print.points_forts.map(p => `<p>• ${p}</p>`).join('')}
+    <div class="section-title">Portail Immobilier</div>
+    <p><span class="label">Titre :</span> ${kit.portail.titre}</p>
+    <p>${kit.portail.description.replace(/\n/g, '<br>')}</p>
+    <p><span class="label">Mots-clés :</span> ${kit.portail.mots_cles.join(', ')}</p>
   </div>
 </div>
 </body>
