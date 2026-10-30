@@ -76,8 +76,8 @@ export function PropertyForm({ onResult, creditsLeft, canGenerate = true }: Prop
   const noCredits = creditsLeft === 0
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-5">
-      <div className="flex items-center justify-between">
+    <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-5 transition-shadow duration-200 hover:shadow-md">
+      <div className="flex items-center justify-between animate-fade-up">
         <h2 className="text-lg font-semibold text-gray-900">Générer du contenu marketing</h2>
         <span className="text-xs bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-medium">
           {creditsLeft === null || creditsLeft === undefined ? '∞' : creditsLeft} crédit(s) restant(s)
@@ -92,7 +92,7 @@ export function PropertyForm({ onResult, creditsLeft, canGenerate = true }: Prop
           value={input.sector || 'immobilier'}
           onChange={e => set('sector', e.target.value as SectorId)}
           required
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-all duration-200"
         >
           {SECTORS.map(s => (
             <option key={s.id} value={s.id}>{s.emoji} {s.label}</option>
@@ -110,7 +110,7 @@ export function PropertyForm({ onResult, creditsLeft, canGenerate = true }: Prop
           onChange={e => set('intitule', e.target.value)}
           placeholder="Ex: iPhone 15 Pro, Villa F4 Cocody, Formation SEO..."
           required
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
         />
       </div>
 
@@ -124,7 +124,7 @@ export function PropertyForm({ onResult, creditsLeft, canGenerate = true }: Prop
           rows={3}
           placeholder="Ex: Neuf, garantie 1 an, livraison rapide, titre foncier..."
           required
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none"
         />
       </div>
 
@@ -138,7 +138,7 @@ export function PropertyForm({ onResult, creditsLeft, canGenerate = true }: Prop
           onChange={e => set('prix', e.target.value)}
           placeholder="Ex: 850 000 FCFA, à partir de 25 000 FCFA/mois"
           required
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
         />
       </div>
 
@@ -152,7 +152,7 @@ export function PropertyForm({ onResult, creditsLeft, canGenerate = true }: Prop
           onChange={e => set('cible', e.target.value)}
           placeholder="Ex: Entrepreneurs, familles, étudiants, PME..."
           required
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
         />
       </div>
 
@@ -164,9 +164,9 @@ export function PropertyForm({ onResult, creditsLeft, canGenerate = true }: Prop
               key={t.value}
               type="button"
               onClick={() => set('ton', t.value)}
-              className={`py-2 px-3 rounded-lg text-sm font-medium border transition-colors ${
+              className={`py-2 px-3 rounded-lg text-sm font-medium border transition-all duration-150 active:scale-95 ${
                 input.ton === t.value
-                  ? 'bg-blue-600 text-white border-blue-600'
+                  ? 'bg-blue-600 text-white border-blue-600 animate-scale-in'
                   : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300'
               }`}
             >
@@ -177,7 +177,7 @@ export function PropertyForm({ onResult, creditsLeft, canGenerate = true }: Prop
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">{error}</div>
+        <div className="animate-scale-in bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">{error}</div>
       )}
 
       {noCredits ? (
@@ -200,11 +200,11 @@ export function PropertyForm({ onResult, creditsLeft, canGenerate = true }: Prop
         <button
           type="submit"
           disabled={loading}
-          className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-6 rounded-xl transition-colors"
+          className="btn-press relative overflow-hidden w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-6 rounded-xl transition-colors"
         >
           {loading ? (
             <>
-              <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+              <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
               </svg>
