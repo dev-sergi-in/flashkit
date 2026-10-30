@@ -55,9 +55,46 @@ const config: Config = {
           '0%': { opacity: '0', transform: 'translateY(10px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
+        'fade-up': {
+          '0%': { opacity: '0', transform: 'translateY(24px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'scale-in': {
+          '0%': { opacity: '0', transform: 'scale(0.93)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        'slide-right': {
+          '0%': { opacity: '0', transform: 'translateX(-16px)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-8px)' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
+        'bounce-soft': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-4px)' },
+        },
+        'gradient-shift': {
+          '0%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+          '100%': { backgroundPosition: '0% 50%' },
+        },
       },
       animation: {
         'fade-in': 'fade-in 0.3s ease-out',
+        'fade-up': 'fade-up 0.5s ease-out both',
+        'scale-in': 'scale-in 0.3s ease-out both',
+        'slide-right': 'slide-right 0.4s ease-out both',
+        'float': 'float 3s ease-in-out infinite',
+        'shimmer': 'shimmer 1.5s infinite',
+        'bounce-soft': 'bounce-soft 2s ease-in-out infinite',
+        'gradient-shift': 'gradient-shift 4s ease infinite',
+        'spin-slow': 'spin 3s linear infinite',
       },
     },
   },
