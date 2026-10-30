@@ -4,18 +4,16 @@ import { createCinetPayCheckout } from '@/lib/stripe'
 import { createSupabaseServer } from '@/lib/supabase-server'
 
 const Schema = z.object({
-  planId: z.enum(['pro', 'agence']),
+  packId: z.enum(['starter', 'pro', 'agence']),
 })
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { planId } = Schema.parse(body)
-
+    const { packId } = Schema.parse(body)
     const supabase = createSupabaseServer()
     const { data: { user } } = await supabase.auth.getUser()
-
-    const url = await createCinetPayCheckout(planId, user?.email)
+    const url = await createCinetPayCheckout(packId, user?.email, user?.id)
     return NextResponse.json({ url })
   } catch (error) {
     console.error('[checkout]', error)
