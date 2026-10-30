@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Sparkles, ArrowLeft, LogOut, User, Crown } from 'lucide-react'
+import { Sparkles, ArrowLeft, LogOut, User, Gem } from 'lucide-react'
 import { PropertyForm } from '@/components/PropertyForm'
 import { ResultsTabs } from '@/components/ResultsTabs'
 import { ExportButton } from '@/components/ExportButton'
@@ -12,36 +12,36 @@ import { useRouter } from 'next/navigation'
 import type { GeneratedKit } from '@/types'
 
 interface QuotaInfo {
-  plan: string
-  remaining: number | null
-  canGenerate: boolean
+  credits: number | null
   email?: string
+  canGenerate: boolean
 }
 
 export default function DashboardPage() {
   const [kit, setKit] = useState<GeneratedKit | null>(null)
-  const [quota, setQuota] = useState<QuotaInfo>({ plan: 'starter', remaining: null, canGenerate: true })
+  const [quota, setQuota] = useState<QuotaInfo>({ credits: null, canGenerate: true })
   const [historyRefresh, setHistoryRefresh] = useState(0)
   const router = useRouter()
 
-  const fetchQuota = useCallback(async () => {
-    try {
-      const res = await fetch('/api/quota')
-      if (res.ok) {
-        const data = await res.json()
-        setQuota({
-          plan: data.plan,
-          remaining: data.remaining,
-          canGenerate: data.canGenerate,
-          email: data.email,
-        })
+  useEffect(() => {
+    const fetchQuota = async () => {
+      try {
+        const res = await fetch('/api/quota')
+        if (res.ok) {
+          const data = await res.json()
+          const credits: number = data.credits
+          setQuota({
+            credits,
+            email: data.email,
+            canGenerate: credits === null || credits > 0,
+          })
+        }
+      } catch {
+        // fallback — keep defaults
       }
-    } catch {
-      // fallback — keep defaults
     }
+    fetchQuota()
   }, [])
-
-  useEffect(() => { fetchQuota() }, [fetchQuota])
 
   const handleLogout = async () => {
     const supabase = createSupabaseBrowser()
@@ -52,11 +52,14 @@ export default function DashboardPage() {
 
   const handleGenerated = (k: GeneratedKit) => {
     setKit(k)
-    setQuota(q => ({
-      ...q,
-      remaining: q.remaining !== null ? Math.max(0, q.remaining - 1) : null,
-      canGenerate: q.remaining !== null ? q.remaining - 1 > 0 : true,
-    }))
+    setQuota(q => {
+      const newCredits = q.credits !== null ? Math.max(0, q.credits - 1) : null
+      return {
+        ...q,
+        credits: newCredits,
+        canGenerate: newCredits === null || newCredits > 0,
+      }
+    })
     setHistoryRefresh(n => n + 1)
   }
 
@@ -72,7 +75,7 @@ export default function DashboardPage() {
               <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
                 <Sparkles className="w-3.5 h-3.5 text-white" />
               </div>
-              <span className="font-bold text-gray-900">Flashkit AI</span>
+              <span className="font-bold text-gray-900">FlashKit AI</span>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -82,14 +85,16 @@ export default function DashboardPage() {
                 {quota.email}
               </div>
             )}
-            {quota.plan === 'starter' ? (
-              <Link href="/pricing" className="flex items-center gap-1.5 text-xs text-blue-600 font-semibold hover:text-blue-700 bg-blue-50 px-2.5 py-1.5 rounded-lg">
-                <Crown className="w-3.5 h-3.5" />
-                Passer Pro
-              </Link>
-            ) : (
-              <span className="text-xs text-blue-600 font-semibold bg-blue-50 px-2.5 py-1.5 rounded-lg capitalize">{quota.plan}</span>
-            )}
+            <div className="flex items-center gap-1.5 text-xs text-blue-700 font-semibold bg-blue-50 px-2.5 py-1.5 rounded-lg">
+              <Gem className="w-3.5 h-3.5" />
+              {quota.credits === null ? '—' : quota.credits} crédit{quota.credits !== 1 ? 's' : ''}
+            </div>
+            <Link
+              href="/pricing"
+              className="text-xs text-white font-semibold bg-blue-600 hover:bg-blue-700 px-2.5 py-1.5 rounded-lg transition-colors"
+            >
+              + Recharger
+            </Link>
             <button
               onClick={handleLogout}
               className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 transition-colors"
@@ -103,9 +108,9 @@ export default function DashboardPage() {
 
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Générateur d'annonces immobilières</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Générateur de contenu marketing</h1>
           <p className="text-gray-500 text-sm mt-1">
-            Remplissez les caractéristiques du bien et générez vos annonces en 3 formats optimisés.
+            Choisissez votre secteur, remplissez les informations et générez 5 formats en 1 clic.
           </p>
         </div>
 
@@ -113,7 +118,7 @@ export default function DashboardPage() {
           <div>
             <PropertyForm
               onResult={handleGenerated}
-              creditsLeft={quota.remaining}
+              creditsLeft={quota.credits}
               canGenerate={quota.canGenerate}
             />
           </div>
