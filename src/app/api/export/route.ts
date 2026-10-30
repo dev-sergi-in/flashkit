@@ -5,10 +5,9 @@ import type { GeneratedKit } from '@/types'
 
 const KitSchema = z.object({
   kit: z.object({
-    annonce_web: z.object({ titre_seo: z.string(), description_longue: z.string(), mots_cles: z.array(z.string()) }),
-    social_media: z.object({ instagram_caption: z.string(), hashtags: z.array(z.string()) }),
-    outreach: z.object({ email_objet: z.string(), email_corps: z.string() }),
-    print: z.object({ titre_vitrine: z.string(), points_forts: z.array(z.string()) }),
+    whatsapp: z.object({ texte: z.string() }),
+    social: z.object({ caption: z.string(), hashtags: z.array(z.string()) }),
+    portail: z.object({ titre: z.string(), description: z.string(), mots_cles: z.array(z.string()) }),
   }),
   format: z.enum(['txt']),
 })
@@ -23,7 +22,7 @@ export async function POST(request: NextRequest) {
       return new NextResponse(text, {
         headers: {
           'Content-Type': 'text/plain; charset=utf-8',
-          'Content-Disposition': 'attachment; filename="kit-marketing.txt"',
+          'Content-Disposition': 'attachment; filename="annonces-immo.txt"',
         },
       })
     }
