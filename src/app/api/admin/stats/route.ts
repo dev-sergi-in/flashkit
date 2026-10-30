@@ -22,33 +22,30 @@ export async function GET() {
 
   const db = adminClient()
 
-  const [quotasRes, generationsRes, usersRes] = await Promise.all([
-    db.from('quotas').select('plan, count'),
+  const [generationsRes, usersRes, transactionsRes] = await Promise.all([
     db.from('generations').select('id, created_at'),
     db.auth.admin.listUsers(),
+    db.from('transactions').select('amount_fcfa, status'),
   ])
 
-  const quotas = quotasRes.data || []
   const generations = generationsRes.data || []
   const users = usersRes.data?.users || []
+  const transactions = (transactionsRes.data || []) as Array<{ amount_fcfa: number; status: string }>
 
-  const planCounts = { starter: 0, pro: 0, agence: 0, enterprise: 0 }
-  for (const q of quotas) {
-    const p = q.plan as keyof typeof planCounts
-    if (p in planCounts) planCounts[p]++
-  }
-
-  // Générations des 7 derniers jours
   const now = Date.now()
   const week = 7 * 24 * 60 * 60 * 1000
   const recentGenerations = generations.filter(
     (g: { created_at: string }) => now - new Date(g.created_at).getTime() < week
   ).length
 
+  const revenue_fcfa = transactions
+    .filter(t => t.status === 'ACCEPTED')
+    .reduce((sum, t) => sum + (t.amount_fcfa || 0), 0)
+
   return NextResponse.json({
     total_users: users.length,
     total_generations: generations.length,
     generations_last_7_days: recentGenerations,
-    plans: planCounts,
+    revenue_fcfa,
   })
 }
