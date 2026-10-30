@@ -1,13 +1,13 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Clock, ChevronDown, ChevronUp, RotateCcw } from 'lucide-react'
+import { Clock, ChevronDown, ChevronUp, RotateCcw, Loader2 } from 'lucide-react'
 import type { GeneratedKit } from '@/types'
 
 interface Generation {
   id: string
   domain: string
-  domain_label: string
+  ton: string
   kit: GeneratedKit
   created_at: string
 }
@@ -17,28 +17,9 @@ interface HistoryPanelProps {
   refreshTrigger?: number
 }
 
-const DOMAIN_EMOJIS: Record<string, string> = {
-  immobilier: '🏠', ecommerce: '🛒', automobile: '🚗', services: '🛠️',
-  digital: '💻', restauration_evenements: '🍽️', beaute_bienetre: '💆',
-  materiel_pro: '⚙️', education_ecoles: '🎓', mode_artisanat: '👗',
-  sante_parapharmacie: '💊', agriculture_agro: '🌾', voyage_logistique: '✈️',
-  finance_juridique: '⚖️', sport_fitness: '🏋️', energie_solaire: '☀️',
-  art_divertissement: '🎨', autre_custom: '📦',
-}
-
 function formatDate(iso: string) {
   const d = new Date(iso)
   return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
-}
-
-function SkeletonCards() {
-  return (
-    <div className="space-y-2">
-      {[0, 1, 2].map(i => (
-        <div key={i} className="animate-pulse bg-gray-100 rounded-xl h-16" />
-      ))}
-    </div>
-  )
 }
 
 export function HistoryPanel({ onReload, refreshTrigger }: HistoryPanelProps) {
@@ -84,7 +65,9 @@ export function HistoryPanel({ onReload, refreshTrigger }: HistoryPanelProps) {
       {open && (
         <div className="border-t border-gray-100 px-5 py-4">
           {loading ? (
-            <SkeletonCards />
+            <div className="flex items-center justify-center py-6">
+              <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+            </div>
           ) : generations.length === 0 ? (
             <p className="text-sm text-gray-400 text-center py-6">Aucune génération enregistrée.</p>
           ) : (
@@ -95,9 +78,9 @@ export function HistoryPanel({ onReload, refreshTrigger }: HistoryPanelProps) {
                   className="flex items-center justify-between gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors group"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <span className="text-lg shrink-0">{DOMAIN_EMOJIS[g.domain] ?? '📄'}</span>
+                    <span className="text-lg shrink-0">🏠</span>
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-gray-800 truncate">{g.domain_label}</p>
+                      <p className="text-sm font-medium text-gray-800 truncate">{g.domain} — {g.ton}</p>
                       <p className="text-xs text-gray-400">{formatDate(g.created_at)}</p>
                     </div>
                   </div>
