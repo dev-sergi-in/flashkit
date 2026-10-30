@@ -24,13 +24,13 @@ export async function GET() {
 
   const [usersRes, quotasRes, gensRes] = await Promise.all([
     db.auth.admin.listUsers(),
-    db.from('quotas').select('user_id, plan, count, reset_at'),
+    db.from('quotas').select('user_id, plan, count, credits, reset_at'),
     db.from('generations').select('user_id, created_at').order('created_at', { ascending: false }),
   ])
 
-  const quotaMap = new Map<string, { plan: string; count: number; reset_at: string }>()
+  const quotaMap = new Map<string, { plan: string; count: number; credits: number; reset_at: string }>()
   for (const q of (quotasRes.data || [])) {
-    quotaMap.set(q.user_id, { plan: q.plan, count: q.count, reset_at: q.reset_at })
+    quotaMap.set(q.user_id, { plan: q.plan ?? 'starter', count: q.count ?? 0, credits: q.credits ?? 0, reset_at: q.reset_at })
   }
 
   const genCountMap = new Map<string, number>()
@@ -48,6 +48,7 @@ export async function GET() {
       created_at: u.created_at,
       plan: quota?.plan ?? 'starter',
       count: quota?.count ?? 0,
+      credits: quota?.credits ?? 0,
       reset_at: quota?.reset_at ?? null,
       total_generations: genCountMap.get(u.id) ?? 0,
       last_generation: lastGenMap.get(u.id) ?? null,
