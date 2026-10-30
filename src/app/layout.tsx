@@ -2,14 +2,14 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Flashkit AI — Annonces immobilières en 5 secondes',
-  description: 'Générez des annonces immobilières professionnelles pour WhatsApp, Facebook, Instagram et les portails web grâce à l\'IA.',
-  keywords: ['annonce immobilière', 'intelligence artificielle', 'immobilier', 'agent immobilier', 'Togo', 'Afrique'],
+  title: 'FlashKit AI — Générateur de Contenu Marketing',
+  description: 'Générez des scripts TikTok, posts Facebook, annonces web, emails et fiches commerciales en 1 clic. FlashKit AI utilise l\'IA Claude pour créer votre contenu marketing en 18 secteurs.',
+  keywords: ['marketing', 'intelligence artificielle', 'TikTok', 'Facebook', 'génération de contenu', 'IA', 'Afrique'],
   metadataBase: new URL('https://flashkit.flashservice.app'),
   alternates: { canonical: 'https://flashkit.flashservice.app' },
   openGraph: {
-    title: 'Flashkit AI',
-    description: 'Annonces immobilières professionnelles générées par IA en 5 secondes.',
+    title: 'FlashKit AI',
+    description: 'Générez 5 formats de contenu marketing en 1 clic avec l\'IA.',
     type: 'website',
     url: 'https://flashkit.flashservice.app',
   },
