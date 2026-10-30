@@ -64,8 +64,8 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="border-b border-gray-100 bg-white">
+    <div className="min-h-screen bg-gray-50 animate-fade-in">
+      <nav className="border-b border-gray-100 bg-white animate-fade-in">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="text-gray-400 hover:text-gray-600">
@@ -85,13 +85,16 @@ export default function DashboardPage() {
                 {quota.email}
               </div>
             )}
-            <div className="flex items-center gap-1.5 text-xs text-blue-700 font-semibold bg-blue-50 px-2.5 py-1.5 rounded-lg">
+            <div className="animate-scale-in flex items-center gap-1.5 text-xs text-blue-700 font-semibold bg-blue-50 px-2.5 py-1.5 rounded-lg">
               <Gem className="w-3.5 h-3.5" />
-              {quota.credits === null ? '—' : quota.credits} crédit{quota.credits !== 1 ? 's' : ''}
+              <span key={quota.credits} className="animate-scale-in">
+                {quota.credits === null ? '—' : quota.credits}
+              </span>
+              {' '}crédit{quota.credits !== 1 ? 's' : ''}
             </div>
             <Link
               href="/pricing"
-              className="text-xs text-white font-semibold bg-blue-600 hover:bg-blue-700 px-2.5 py-1.5 rounded-lg transition-colors"
+              className="btn-press animate-bounce-soft text-xs text-white font-semibold bg-blue-600 hover:bg-blue-700 px-2.5 py-1.5 rounded-lg transition-colors"
             >
               + Recharger
             </Link>
@@ -107,7 +110,7 @@ export default function DashboardPage() {
       </nav>
 
       <div className="max-w-5xl mx-auto px-4 py-8">
-        <div className="mb-6">
+        <div className="mb-6 animate-fade-up delay-100">
           <h1 className="text-2xl font-bold text-gray-900">Générateur de contenu marketing</h1>
           <p className="text-gray-500 text-sm mt-1">
             Choisissez votre secteur, remplissez les informations et générez 5 formats en 1 clic.
@@ -115,7 +118,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
+          <div className="animate-fade-up delay-200">
             <PropertyForm
               onResult={handleGenerated}
               creditsLeft={quota.credits}
@@ -123,9 +126,9 @@ export default function DashboardPage() {
             />
           </div>
 
-          <div>
+          <div className="animate-fade-up delay-300">
             {kit ? (
-              <div className="space-y-3">
+              <div className="animate-scale-in space-y-3">
                 <div className="flex items-center justify-between">
                   <h2 className="text-sm font-semibold text-gray-700">Kit généré</h2>
                   <ExportButton kit={kit} />
@@ -135,7 +138,7 @@ export default function DashboardPage() {
             ) : (
               <div className="h-full min-h-64 bg-white rounded-2xl border border-dashed border-gray-200 flex flex-col items-center justify-center text-center p-8">
                 <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center mb-4">
-                  <Sparkles className="w-6 h-6 text-blue-400" />
+                  <Sparkles className="w-6 h-6 text-blue-400 animate-float" />
                 </div>
                 <p className="text-gray-500 font-medium">Votre kit apparaîtra ici</p>
                 <p className="text-sm text-gray-400 mt-1">Remplissez le formulaire et cliquez sur Générer</p>
@@ -144,7 +147,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="mt-6">
+        <div className="mt-6 animate-fade-up delay-400">
           <HistoryPanel onReload={setKit} refreshTrigger={historyRefresh} />
         </div>
       </div>
